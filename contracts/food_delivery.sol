@@ -9,17 +9,28 @@ contract FoodDelivery {
     }
 
     struct Restaurant{
-        uint256 id;
+        address addr;
         string name;
         string description;
         Item[] items;
     }
 
-    Restaurant public testRestaurant;
+    // function createRestaurant(address addr, string calldata name, string calldata description) private pure returns(Restaurant storage) {
+    //     Restaurant storage restaurant = ;
+    //     restaurant.addr = addr;
+    //     restaurant.name = name;
+    //     restaurant.description = description;
 
-    constructor() public {
-        testRestaurant.id = 1;
-        testRestaurant.description = 'description sample';
-        testRestaurant.name = 'name test';
+    //     return restaurant;
+    // }
+
+    mapping(address => Restaurant) public restaurants;
+
+    function registerRestaurant(string calldata name, string calldata description) public {
+        Restaurant storage restaurant = restaurants[msg.sender];
+        restaurant.addr = msg.sender;
+        restaurant.name = name;
+        restaurant.description = description;
+        restaurants[msg.sender] = restaurant;
     }
 }
