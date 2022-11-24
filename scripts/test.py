@@ -4,7 +4,7 @@ from brownie import FoodDelivery
 
 def test_app():
     last_contract = FoodDelivery[-1]
-    assert last_contract.test() == 23
+    assert last_contract.testRestaurant()['id'] == 1
 
 
 def main():
