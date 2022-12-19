@@ -20,15 +20,26 @@ contract FoodDelivery {
         string name;
     }
 
+    enum OrderStatus {
+        PENDING,                // order submitted by client, but before the restaurant accepts the order
+        PROCESSING,             // order submited by client and accepted by restaurant
+        WAITING_COURIER,        // order ready for courier
+        DELIVERING,             // order picked up by a courier
+        DELIVERED,              // order delivered, confirmed by client
+        CANCELLED               // order was cancelled
+    }
+
     struct Order {
         uint256 id;
         address restaurantAddr;
         address clientAddr;
+        address courierAddr;
         uint256[] itemIndices;
         uint256[] quantities;
+        uint256 deliveryFee;
         uint256 totalPrice;
-        bool isComplete;
-        bool isDelivered;
+        string deliveryAddress;
+        OrderStatus status;
     }
 
 
@@ -63,14 +74,19 @@ contract FoodDelivery {
         restaurants[msg.sender] = restaurant;
     }
 
-    function placeOrder(address restaurantAddr, uint256[] memory itemIds, uint256[] memory quantities) public {
-        Restaurant storage restaurant = restaurants[restaurantAddr];
-        uint256 totalPrice = 0;
+    function placeOrder(address restaurantAddr, uint256[] memory itemIds, uint256[] memory quantities, uint256 deliveryFee, string memory deliveryAddress) public payable {
+        Restaurant memory restaurant = restaurants[restaurantAddr];
+        require(restaurant.addr != address(0), "Invalid restaurant address");
 
+        uint256 totalPrice = 0;
         for (uint256 i = 0; i < itemIds.length; i++) {
+            require(itemIds[i] < restaurant.items.length, "Invalid item ID");
             Item memory item = restaurant.items[itemIds[i]];
             totalPrice += item.price * quantities[i];
         }
+
+        require(totalPrice > 0, "Total price of order must be greater than zero");
+        require(msg.value == totalPrice + deliveryFee, "Incorrect amount paid");
 
         uint256 id = numberOfOrders++;
 
@@ -78,11 +94,37 @@ contract FoodDelivery {
             id: id,
             restaurantAddr: restaurantAddr,
             clientAddr: msg.sender,
+            courierAddr: address(0),
             itemIndices: itemIds,
             quantities: quantities,
+            deliveryFee: deliveryFee,
             totalPrice: totalPrice,
-            isComplete: false,
-            isDelivered: false
+            deliveryAddress: deliveryAddress,
+            status: OrderStatus.PENDING
         });
     }
+
+    function acceptOrder(uint256 orderId) public {
+        Order storage order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.restaurantAddr == msg.sender, "Only the restaurant for which the order was made can accept it");
+        require(order.status == OrderStatus.PENDING, "Can only accept orders for which the status is PENDING");
+
+        order.status = OrderStatus.PROCESSING;
+    }
+
+    function declineOrder(uint256 orderId) public {
+        Order storage order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.restaurantAddr == msg.sender, "Only the restaurant can decline the order");
+        require(order.status == OrderStatus.PENDING, "Order must be pending");
+
+        // refund the client
+        address payable clientAddr = payable(order.clientAddr);
+        require(clientAddr.send(order.totalPrice + order.deliveryFee), "Failed to refund client");
+
+        order.status = OrderStatus.CANCELLED;
+        orders[orderId] = order;
+    }
+
 }
