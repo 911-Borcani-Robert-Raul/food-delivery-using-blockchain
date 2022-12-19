@@ -129,6 +129,16 @@ contract FoodDelivery {
         orders[orderId] = order;
     }
 
+    function increaseDeliveryFee(uint256 orderId) public payable {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.status == OrderStatus.WAITING_COURIER);
+        require(order.clientAddr == msg.sender, "Order delivery fee must be increased by the client");
+
+        order.deliveryFee += msg.value;
+        orders[orderId] = order;
+    }
+
     function takeOrder(uint256 orderId) public {
         Order memory order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
