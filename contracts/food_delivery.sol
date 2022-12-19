@@ -177,4 +177,26 @@ contract FoodDelivery {
         order.status = OrderStatus.DELIVERED;
         orders[orderId] = order;
     }
+
+    function cancelOrder(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        
+        // refund the client
+        address payable clientAddr = payable(order.clientAddr);
+        address payable restaurantAddr = payable(order.restaurantAddr);
+        if (order.status == OrderStatus.PENDING || order.status == OrderStatus.WAITING_COURIER
+            || order.status == OrderStatus.ASSIGNED_COURIER) {      // full refund
+            require(clientAddr.send(order.totalPrice + order.deliveryFee), "Failed to refund client");
+        } else if (order.status == OrderStatus.READY_TO_DELIVER) {  // partial refund, as the restaurant did finish the order
+            require(restaurantAddr.send(order.totalPrice), "Failed to refund restaurant");
+            require(clientAddr.send(order.deliveryFee), "Failed to refund client");
+        } else {        // no refund for client, order was just being delivered
+            address payable courierAddr = payable(order.clientAddr);
+            require(restaurantAddr.send(order.totalPrice), "Failed to refund restaurant");
+            require(courierAddr.send(order.deliveryFee), "Failed to refund courier");
+        }
+
+        order.status = OrderStatus.CANCELLED;
+    }
 }
