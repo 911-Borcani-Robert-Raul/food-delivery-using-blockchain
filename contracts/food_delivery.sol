@@ -22,9 +22,10 @@ contract FoodDelivery {
 
     enum OrderStatus {
         PENDING,                // order submitted by client, but before the restaurant accepts the order
-        PROCESSING,             // order submited by client and accepted by restaurant
-        WAITING_COURIER,        // order ready for courier
-        DELIVERING,             // order picked up by a courier
+        WAITING_COURIER,        // order ready for courier (after being accepted by restaurant)
+        ASSIGNED_COURIER,       // order accepted by a courier
+        READY_TO_DELIVER,       // order finished by restaurant, ready to deliver
+        DELIVERING,             // order being delivered by the courier
         DELIVERED,              // order delivered, confirmed by client
         CANCELLED               // order was cancelled
     }
@@ -105,16 +106,17 @@ contract FoodDelivery {
     }
 
     function acceptOrder(uint256 orderId) public {
-        Order storage order = orders[orderId];
+        Order memory order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
         require(order.restaurantAddr == msg.sender, "Only the restaurant for which the order was made can accept it");
         require(order.status == OrderStatus.PENDING, "Can only accept orders for which the status is PENDING");
 
-        order.status = OrderStatus.PROCESSING;
+        order.status = OrderStatus.WAITING_COURIER;
+        orders[orderId] = order;
     }
 
     function declineOrder(uint256 orderId) public {
-        Order storage order = orders[orderId];
+        Order memory order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
         require(order.restaurantAddr == msg.sender, "Only the restaurant can decline the order");
         require(order.status == OrderStatus.PENDING, "Order must be pending");
@@ -127,4 +129,42 @@ contract FoodDelivery {
         orders[orderId] = order;
     }
 
+    function takeOrder(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.status == OrderStatus.WAITING_COURIER, "Order must be in the processing state");
+        order.courierAddr = msg.sender;
+        order.status = OrderStatus.ASSIGNED_COURIER;
+        orders[orderId] = order;
+    }
+
+    function orderReadyToDeliver(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.status == OrderStatus.ASSIGNED_COURIER);
+        require(order.restaurantAddr == msg.sender, "Order must be marked ready to deliver by the restaurant of the order");
+
+        order.status = OrderStatus.READY_TO_DELIVER;
+        orders[orderId] = order;
+    }
+
+    function orderDelivering(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.status == OrderStatus.READY_TO_DELIVER);
+        require(order.courierAddr == msg.sender, "Order must be delivered by courier that accepted it");
+
+        order.status = OrderStatus.DELIVERING;
+        orders[orderId] = order;
+    }
+
+    function orderDelivered(uint256 orderId) public {
+        Order memory order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.status == OrderStatus.DELIVERING);
+        require(order.clientAddr == msg.sender, "Order delivery must be confirmed by client");
+
+        order.status = OrderStatus.DELIVERED;
+        orders[orderId] = order;
+    }
 }
