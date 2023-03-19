@@ -1,7 +1,10 @@
-from brownie import accounts, network, config
+from brownie import accounts, network, config, MockV3Aggregator
 
 FORKED_LOCAL_ENVIRONEMENTS = ["mainnet-fork-dev", "mainnet-fork"]
 LOCAL_BLOCKCHAIN_ENVIRONEMENTS = ["development", "ganache-local"]
+
+DECIMALS = 18
+STARTING_PRICE = 2000
 
 def get_account(index=None, id=None):
     if index:
@@ -15,3 +18,10 @@ def get_account(index=None, id=None):
         return accounts[0]
     
     return accounts.add(config["wallets"]["from_key"])
+
+def deploy_mocks():
+    print(f"The active network is {network.show_active()}")
+    print(f"Deploying mocks...")
+    if len(MockV3Aggregator) < 1:
+        MockV3Aggregator.deploy(DECIMALS, Web3.toWei(STARTING_PRICE, "ether"), {"from": get_account()})
+    print("Mocks deployed!")
