@@ -3,5 +3,5 @@
     "4": "rinkeby",
     "5": "goerli",
     "1": "mainnet",
-    "1337": "dev"
+    "1337": "ganache"
 }

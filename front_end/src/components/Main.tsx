@@ -1,30 +1,54 @@
-import { useEtherBalance, useEthers } from "@usedapp/core"
+import { useEtherBalance, useEthers } from "@usedapp/core";
 import { formatEther } from "ethers/lib/utils";
 import helperConfig from "../helper-config.json";
-import { useNumberOfRestaurants } from "../hooks/RestaurantHooks";
+import {
+  useGetNumberOfRestaurants,
+  useGetRestaurant,
+  useGetRestaurantAddress,
+  useGetRestaurants,
+} from "../hooks/RestaurantHooks";
+import { RestaurantComponent } from "./RestaurantComponent";
+import networkMapping from "../chain-info/deployments/map.json";
+import { constants } from "ethers";
+import { Restaurant } from "../domain/Restaurant";
+import { useMemo } from "react";
 
 export const Main = () => {
-    const { account, chainId, error } = useEthers()
-    const networkName = chainId ? helperConfig[chainId] : "dev"
-    const etherBalance = useEtherBalance(account)
+  const { account, chainId, error } = useEthers();
+  const networkName = chainId ? helperConfig[chainId] : "dev";
+  const etherBalance = useEtherBalance(account);
 
-    const res = useNumberOfRestaurants("0x2feE3746B7a530Fca9AF3AE94a4734790B151052", "0x7887fBECC18Dcb05A4Ac2e30DD40688B2cfA8A58");
+  let stringChainId = String(chainId);
+  const contractAddress = chainId
+    ? networkMapping[stringChainId]["FoodDelivery"][0]
+    : constants.AddressZero;
+  const numberOfRestaurants = useGetNumberOfRestaurants(contractAddress);
+  const firstRestaurantAddr = useGetRestaurantAddress(contractAddress, 0);
+  const firstRestaurant = useGetRestaurant(
+    contractAddress,
+    firstRestaurantAddr
+  );
 
-    // console.log(chainId);
-    // console.log(networkName);
-    // console.log(account);
-    // console.log(etherBalance);
+  const restaurants = useGetRestaurants(contractAddress, numberOfRestaurants!);
 
-    console.log(res);
+  // console.log(chainId);
+  // console.log(networkName);
+  // console.log(error);
+  // console.log(etherBalance);
 
-    return (
-        <div>
-            <div>
-                Hi! Your ether balance is {formatEther(etherBalance ? etherBalance : 0)}!
-            </div>
-            <div>
-                {res}
-            </div>
-        </div>
-    )
-}
+  console.log(restaurants);
+
+  return (
+    <div>
+      <div>
+        Hi! Your ether balance is {formatEther(etherBalance ? etherBalance : 0)}
+        ! There are {numberOfRestaurants} restaurants.
+      </div>
+      <div>
+        {restaurants.map((restaurant) => (
+          <RestaurantComponent key={restaurant.addr} restaurant={restaurant} />
+        ))}
+      </div>
+    </div>
+  );
+};

@@ -51,10 +51,12 @@ contract FoodDelivery {
     mapping(address => Restaurant) public restaurants;
     mapping(uint256 => Order) public orders;
     mapping(address => Client) public clients;
+    address[] public restaurantsAddr;
+    address[] public clientsAddr;
     uint256 numberOfOrders = 0;
     AggregatorV3Interface public ethUsdPriceFeed;
 
-    constructor (address priceFeedAddress) public {
+    constructor (address priceFeedAddress) {
         ethUsdPriceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
@@ -64,6 +66,14 @@ contract FoodDelivery {
 
     function getMenuEntryAtIndex(address restaurant, uint index) public view returns(Item memory) {
         return restaurants[restaurant].items[index];
+    }
+
+    function getNumberOfRestaurants() public view returns(uint) {
+        return restaurantsAddr.length;
+    }
+
+    function getNumberOfClients() public view returns(uint) {
+        return clientsAddr.length;
     }
 
     function getPriceInEth(uint256 usdPrice) public view returns (uint256) {
@@ -78,12 +88,14 @@ contract FoodDelivery {
         restaurant.addr = msg.sender;
         restaurant.name = name;
         restaurant.description = description;
+        restaurantsAddr.push(msg.sender);
     }
 
     function registerClient(string calldata name) public {
         Client storage client = clients[msg.sender];
         client.addr = msg.sender;
         client.name = name;
+        clientsAddr.push(msg.sender);
     }
 
     function addItem(uint256 id, string calldata name, string calldata description, uint256 price) public {
