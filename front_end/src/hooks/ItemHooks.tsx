@@ -1,0 +1,166 @@
+import { Falsy, useCall, useContractFunction } from "@usedapp/core";
+import { Contract, utils } from "ethers";
+import { useEffect, useState } from "react";
+import abi from ".././chain-info/contracts/FoodDelivery.json";
+import { alchemyGoerliProvider } from "../App";
+import { Item } from "../domain/Item";
+
+export function useGetNumberOfItemsInMenu(
+  contractAddress: string,
+  restaurantAddress: string
+) {
+  const contractInterface = new utils.Interface(abi.abi);
+  console.log("Getting number of items...");
+  const { value, error } =
+    useCall(
+      contractAddress && {
+        contract: new Contract(contractAddress, contractInterface),
+        method: "getNumberOfItemsInMenu",
+        args: [restaurantAddress],
+      }
+    ) ?? {};
+
+  if (error) {
+    console.error(`Error calling contract: ${error.message}`);
+    return undefined;
+  }
+
+  if (value !== undefined) {
+    return parseInt(value.toString());
+  }
+  return undefined;
+}
+
+export function useGetItemByIndex(
+  contractAddress: string,
+  restaurantAddress: string,
+  index: number
+) {
+  const [item, setItem] = useState<Item>();
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const contractInterface = new utils.Interface(abi.abi);
+      const contract = new Contract(
+        contractAddress,
+        contractInterface,
+        alchemyGoerliProvider
+      );
+
+      console.log(
+        `Fetching item ${index} from restaurant ${restaurantAddress}...`
+      );
+      const item = await getItem(contract, restaurantAddress, index);
+      setItem(item);
+    };
+
+    if (contractAddress) {
+      fetchRestaurants();
+    }
+  }, [contractAddress, restaurantAddress, index]);
+
+  return item;
+}
+
+export function useGetItems(
+  contractAddress: string,
+  restaurantAddress: string,
+  numberOfItems: number
+) {
+  const [items, setItems] = useState<Item[]>([]);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const contractInterface = new utils.Interface(abi.abi);
+      const contract = new Contract(
+        contractAddress,
+        contractInterface,
+        alchemyGoerliProvider
+      );
+
+      const itemsArray = [];
+      for (let itemIndex = 0; itemIndex < numberOfItems; ++itemIndex) {
+        const item = await getItem(contract, restaurantAddress, itemIndex);
+        if (item) {
+          itemsArray.push(item);
+        }
+      }
+      setItems(itemsArray);
+    };
+
+    if (contractAddress && numberOfItems > 0) {
+      fetchRestaurants();
+    }
+  }, [contractAddress, restaurantAddress, numberOfItems]);
+
+  return items;
+}
+
+async function getItem(
+  contract: Contract,
+  restaurantAddress: string,
+  index: number
+) {
+  try {
+    const value = await contract.callStatic.getMenuEntryAtIndex(
+      restaurantAddress,
+      index
+    );
+
+    if (
+      value !== undefined &&
+      value.id &&
+      value.name &&
+      value.description &&
+      value.price
+    ) {
+      return new Item(value.id, value.name, value.description, value.price);
+    } else {
+      console.error(`Invalid response from contract: ${JSON.stringify(value)}`);
+      return undefined;
+    }
+  } catch (error: any) {
+    console.error(`Error calling contract: ${error.toString()}`);
+    return undefined;
+  }
+}
+
+export function useUpdateItem(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "updateItem", {
+    transactionName: "UpdateItem",
+  });
+
+  const updateItem = async (item: Item) => {
+    await contract.getWeiPriceForOrder(
+      send(item.id, item.name, item.description, item.price)
+    );
+  };
+
+  return { state, updateItem };
+}
+
+export function useAddItem(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "addItem", {
+    transactionName: "AddItem",
+  });
+
+  const addItem = async (item: Item) => {
+    await contract.getWeiPriceForOrder(
+      send(item.name, item.description, item.price)
+    );
+  };
+
+  return { state, addItem };
+}

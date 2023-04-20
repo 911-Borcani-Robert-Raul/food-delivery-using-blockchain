@@ -47,10 +47,18 @@ contract FoodDelivery {
         OrderStatus status;
     }
 
+    struct Review {
+        uint256 orderId;
+        uint256 rating;
+        string comment;
+    }
 
     mapping(address => Restaurant) public restaurants;
-    mapping(uint256 => Order) public orders;
     mapping(address => Client) public clients;
+    mapping(address => uint256[]) public clientsToOrdersMapping;
+    mapping(uint256 => Review) public reviews;
+    Order[] public orders;
+    mapping(address => uint256[]) public restaurantToOrdersIds;
     address[] public restaurantsAddr;
     address[] public clientsAddr;
     uint256 numberOfOrders = 0;
@@ -76,11 +84,35 @@ contract FoodDelivery {
         return clientsAddr.length;
     }
 
+    function getNumberOfOrderForClient(address client) public view returns(uint) {
+        return clientsToOrdersMapping[client].length;
+    }
+
     function getPriceInEth(uint256 usdPrice) public view returns (uint256) {
         (,int256 price,,, ) = ethUsdPriceFeed.latestRoundData();
         uint8 decimals = ethUsdPriceFeed.decimals();
         uint256 cost = (usdPrice * 10 ** decimals) / (uint256(price) / 10 ** 9);
         return cost;
+    }
+
+    function getOrderItemsAndQuantities(uint256 orderId) public view returns (Item[] memory, uint256[] memory) {
+        Order storage order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+
+        // Get the restaurant for this order
+        Restaurant storage restaurant = restaurants[order.restaurantAddr];
+
+        // Initialize an array to store the ordered items
+        Item[] memory orderedItems = new Item[](order.itemIndices.length);
+
+        // Loop through the itemIndices array in the order and populate the orderedItems array
+        for (uint256 i = 0; i < order.itemIndices.length; i++) {
+            uint256 itemIndex = order.itemIndices[i];
+            orderedItems[i] = restaurant.items[itemIndex];
+        }
+
+        // Return both ordered items and their corresponding quantities
+        return (orderedItems, order.quantities);
     }
 
     function registerRestaurant(string calldata name, string calldata description) public {
@@ -98,14 +130,29 @@ contract FoodDelivery {
         clientsAddr.push(msg.sender);
     }
 
-    function addItem(uint256 id, string calldata name, string calldata description, uint256 price) public {
+    function addItem(string calldata name, string calldata description, uint256 price) public returns(uint256) {
         Restaurant storage restaurant = restaurants[msg.sender];
+        uint256 id = restaurant.items.length;
         restaurant.items.push(Item({
             id: id,
             name: name,
             description: description,
             price: price
         }));
+
+        return id;
+    }
+
+    function updateItem(uint256 id, string calldata name, string calldata description, uint256 price) public returns(uint256) {
+        Restaurant storage restaurant = restaurants[msg.sender];
+        restaurant.items[id] = Item({
+            id: id,
+            name: name,
+            description: description,
+            price: price
+        });
+
+        return id;
     }
 
     function getWeiPriceForOrder(address restaurantAddr, uint256[] calldata itemIds, uint256[] calldata quantities, uint256 deliveryFee) public view returns(uint256, uint256) {
@@ -129,9 +176,9 @@ contract FoodDelivery {
         (uint256 totalPrice, uint256 ethDeliveryFee) = getWeiPriceForOrder(restaurantAddr, itemIds, quantities, deliveryFee);
         require(msg.value >= totalPrice + ethDeliveryFee, "Incorrect amount paid");
 
-        uint256 id = numberOfOrders++;
+        uint256 id = orders.length;
 
-        orders[id] = Order({
+        orders.push(Order({
             id: id,
             restaurantAddr: restaurantAddr,
             clientAddr: msg.sender,
@@ -142,7 +189,9 @@ contract FoodDelivery {
             totalPrice: totalPrice,
             deliveryAddress: deliveryAddress,
             status: OrderStatus.PENDING
-        });
+        }));
+        clientsToOrdersMapping[msg.sender].push(id);
+        restaurantToOrdersIds[restaurantAddr].push(id);
     }
 
     function acceptOrder(uint256 orderId) public {
@@ -231,5 +280,41 @@ contract FoodDelivery {
         }
 
         order.status = OrderStatus.CANCELLED;
+    }
+
+    function placeReview(uint256 orderId, uint256 rating, string calldata comment) public {
+        Order storage order = orders[orderId];
+        require(order.id == orderId, "Order with given id does not exist");
+        require(order.clientAddr == msg.sender, "Only the client who placed the order can leave a review");
+        require(order.status == OrderStatus.DELIVERED, "Only delivered orders can be reviewed");
+
+        reviews[orderId] = Review({
+            orderId: orderId,
+            rating: rating,
+            comment: comment
+        });
+    }
+
+    function getReview(uint256 orderId) public view returns (Review memory) {
+        return reviews[orderId];
+    }
+
+    function getAverageRatingForRestaurant(address restaurantAddr) public view returns (uint256) {
+        uint256 totalRating = 0;
+        uint256 numberOfRatings = 0;
+
+        for (uint256 i = 0; i < restaurantToOrdersIds[restaurantAddr].length; i++) {
+            uint256 orderId = restaurantToOrdersIds[restaurantAddr][i];
+            if (reviews[orderId].orderId == orderId) {
+                totalRating += reviews[orderId].rating;
+                numberOfRatings++;
+            }
+        }
+
+        if (numberOfRatings == 0) {
+            return 0;
+        } else {
+            return totalRating / numberOfRatings;
+        }
     }
 }
