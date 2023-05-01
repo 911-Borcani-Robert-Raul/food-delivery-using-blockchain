@@ -10,7 +10,6 @@ export function useGetNumberOfItemsInMenu(
   restaurantAddress: string
 ) {
   const contractInterface = new utils.Interface(abi.abi);
-  console.log("Getting number of items...");
   const { value, error } =
     useCall(
       contractAddress && {
@@ -45,10 +44,6 @@ export function useGetItemByIndex(
         contractAddress,
         contractInterface,
         alchemyGoerliProvider
-      );
-
-      console.log(
-        `Fetching item ${index} from restaurant ${restaurantAddress}...`
       );
       const item = await getItem(contract, restaurantAddress, index);
       setItem(item);
@@ -112,9 +107,16 @@ async function getItem(
       value.id &&
       value.name &&
       value.description &&
-      value.price
+      value.price &&
+      value.available !== undefined
     ) {
-      return new Item(value.id, value.name, value.description, value.price);
+      return new Item(
+        value.id,
+        value.name,
+        value.description,
+        value.price,
+        value.available
+      );
     } else {
       console.error(`Invalid response from contract: ${JSON.stringify(value)}`);
       return undefined;
@@ -157,10 +159,48 @@ export function useAddItem(contractAddress: string) {
   });
 
   const addItem = async (item: Item) => {
+    console.log(item.name);
+    console.log(item.description);
     await contract.getWeiPriceForOrder(
       send(item.name, item.description, item.price)
     );
   };
 
   return { state, addItem };
+}
+
+export function useEnableItem(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "enableItem", {
+    transactionName: "EnableItem",
+  });
+
+  const enableItem = async (itemId: number) => {
+    await contract.enableItem(send(itemId));
+  };
+
+  return { state, enableItem };
+}
+
+export function useDisableItem(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "disableItem", {
+    transactionName: "DisableItem",
+  });
+
+  const disableItem = async (itemId: number) => {
+    await contract.disableItem(send(itemId));
+  };
+
+  return { state, disableItem };
 }

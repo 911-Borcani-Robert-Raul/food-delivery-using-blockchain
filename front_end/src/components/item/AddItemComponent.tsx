@@ -22,7 +22,7 @@ export function AddItemComponent({
 
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    const newItem = new Item(undefined, name, description, price);
+    const newItem = new Item(undefined, name, description, price, true);
     addItem(newItem);
   };
 

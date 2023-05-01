@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { alchemyGoerliProvider } from "../../App";
 import { Item } from "../../domain/Item";
 import abi from "../../chain-info/contracts/FoodDelivery.json";
-import { useUpdateItem } from "../../hooks/ItemHooks";
+import {
+  useDisableItem,
+  useEnableItem,
+  useUpdateItem,
+} from "../../hooks/ItemHooks";
 
 interface ItemComponentProps {
   contractAddress: string;
@@ -21,10 +25,58 @@ export function ItemManagementComponent({
   const [price, setPrice] = useState(item.price);
   const [progress, setProgress] = useState("");
   const { state, updateItem } = useUpdateItem(contractAddress);
+  const { state: enableState, enableItem } = useEnableItem(contractAddress);
+  const { state: disableState, disableItem } = useDisableItem(contractAddress);
+  const [enableTransactionStatus, setEnableTransactionStatus] = useState("");
+  const [disableTransactionStatus, setDisableTransactionStatus] = useState("");
+
+  useEffect(() => {
+    if (enableState.status === "Success") {
+      setEnableTransactionStatus("Enable request has completed successfully!");
+    } else if (enableState.status === "Exception") {
+      setEnableTransactionStatus(
+        "Error enabling item: " + enableState.errorMessage
+      );
+    } else if (enableState.status === "Mining") {
+      setEnableTransactionStatus("Enable request is being processed...");
+    } else {
+      setEnableTransactionStatus("");
+    }
+  }, [enableState]);
+
+  useEffect(() => {
+    if (disableState.status === "Success") {
+      setDisableTransactionStatus(
+        "Disable request has completed successfully!"
+      );
+    } else if (disableState.status === "Exception") {
+      setDisableTransactionStatus(
+        "Error disabing item: " + disableState.errorMessage
+      );
+    } else if (disableState.status === "Mining") {
+      setDisableTransactionStatus("Disabling request is being processed...");
+    } else {
+      setDisableTransactionStatus("");
+    }
+  }, [disableState]);
+
+  async function onClick_enableItem() {
+    await enableItem(item.id!);
+  }
+
+  async function onClick_disableItem() {
+    await disableItem(item.id!);
+  }
 
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    const updatedItem = new Item(item.id, name, description, price);
+    const updatedItem = new Item(
+      item.id,
+      name,
+      description,
+      price,
+      item.available
+    );
     updateItem(updatedItem);
   };
 
@@ -69,6 +121,20 @@ export function ItemManagementComponent({
         <button type="submit">Update</button>
       </form>
       {progress && <p>{progress}</p>}
+
+      {item.available && (
+        <div>
+          <button onClick={onClick_disableItem}>Disable item</button>
+          <p>{disableTransactionStatus}</p>
+        </div>
+      )}
+
+      {!item.available && (
+        <div>
+          <button onClick={onClick_enableItem}>Enable item</button>
+          <p>{enableTransactionStatus}</p>
+        </div>
+      )}
     </div>
   );
 }

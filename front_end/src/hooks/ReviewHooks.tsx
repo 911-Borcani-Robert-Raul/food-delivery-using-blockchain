@@ -3,6 +3,7 @@ import { Review } from "../domain/Review";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { Contract, utils } from "ethers";
 import { alchemyGoerliProvider } from "../App";
+import { useContractFunction } from "@usedapp/core";
 
 export function useGetOrderReview(contractAddress: string, orderId: number) {
   const [review, setReview] = useState<Review>();
@@ -16,7 +17,6 @@ export function useGetOrderReview(contractAddress: string, orderId: number) {
         alchemyGoerliProvider
       );
 
-      console.log(`Fetching review for order ${orderId}...`);
       const review = await getReview(contract, orderId);
       setReview(review);
     };
@@ -43,4 +43,22 @@ async function getReview(contract: Contract, orderId: number) {
     console.error(`Error calling contract: ${error.toString()}`);
     return undefined;
   }
+}
+
+export function usePlaceReview(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "placeReview", {
+    transactionName: "PlaceReview",
+  });
+
+  const placeReview = async (review: Review) => {
+    send(review.orderId, review.rating, review.comment);
+  };
+
+  return { state, placeReview };
 }

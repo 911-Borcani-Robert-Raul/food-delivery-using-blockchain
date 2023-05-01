@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.13;
 
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "AggregatorV3Interface.sol";
 
 contract FoodDelivery {
     struct Item{
@@ -10,6 +10,7 @@ contract FoodDelivery {
         string name;
         string description;
         uint256 price;          // price in USD
+        bool available;
     }
 
     struct Restaurant{
@@ -57,8 +58,10 @@ contract FoodDelivery {
     mapping(address => Client) public clients;
     mapping(address => uint256[]) public clientsToOrdersMapping;
     mapping(uint256 => Review) public reviews;
-    Order[] public orders;
     mapping(address => uint256[]) public restaurantToOrdersIds;
+    mapping(address => uint256[]) public couriersToOrdersMapping;
+    uint256[] public ordersWaitingForCourier;
+    Order[] public orders;
     address[] public restaurantsAddr;
     address[] public clientsAddr;
     uint256 numberOfOrders = 0;
@@ -86,6 +89,36 @@ contract FoodDelivery {
 
     function getNumberOfOrderForClient(address client) public view returns(uint) {
         return clientsToOrdersMapping[client].length;
+    }
+
+    function getNumberOfOrderForRestaurant(address restaurant) public view returns(uint) {
+        return restaurantToOrdersIds[restaurant].length;
+    }
+
+    function getNumberOfOrdersForCourier(address courier) public view returns(uint) {
+        return couriersToOrdersMapping[courier].length;
+    }
+
+    function getOrdersByStatus(OrderStatus status) public view returns (Order[] memory) {
+        uint256 numberOfOrdersWithStatus = 0;
+        for (uint256 i = 0; i < orders.length; i++) {
+            if (orders[i].status == status) {
+                numberOfOrdersWithStatus++;
+            }
+        }
+        Order[] memory ordersWithStatus = new Order[](numberOfOrdersWithStatus);
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < orders.length; i++) {
+            if (orders[i].status == status) {
+                ordersWithStatus[currentIndex] = orders[i];
+                currentIndex++;
+            }
+        }
+        return ordersWithStatus;
+    }
+
+    function getNumberOfOrdersWaitingForCourier() public view returns (uint256) {
+        return ordersWaitingForCourier.length;
     }
 
     function getPriceInEth(uint256 usdPrice) public view returns (uint256) {
@@ -137,7 +170,8 @@ contract FoodDelivery {
             id: id,
             name: name,
             description: description,
-            price: price
+            price: price,
+            available: true
         }));
 
         return id;
@@ -149,10 +183,21 @@ contract FoodDelivery {
             id: id,
             name: name,
             description: description,
-            price: price
+            price: price,
+            available: true
         });
 
         return id;
+    }
+
+    function enableItem(uint256 itemId) public {
+        Restaurant storage restaurant = restaurants[msg.sender];
+        restaurant.items[itemId].available = true;
+    }
+
+    function disableItem(uint256 itemId) public {
+        Restaurant storage restaurant = restaurants[msg.sender];
+        restaurant.items[itemId].available = false;
     }
 
     function getWeiPriceForOrder(address restaurantAddr, uint256[] calldata itemIds, uint256[] calldata quantities, uint256 deliveryFee) public view returns(uint256, uint256) {
@@ -172,6 +217,10 @@ contract FoodDelivery {
     function placeOrder(address restaurantAddr, uint256[] calldata itemIds, uint256[] calldata quantities, uint256 deliveryFee, string calldata deliveryAddress) public payable {
         Restaurant storage restaurant = restaurants[restaurantAddr];
         require(restaurant.addr != address(0), "Invalid restaurant address");
+
+        for (uint i = 0; i < itemIds.length; ++i) {
+            require(restaurant.items[itemIds[i]].available == true, "Order contains unavailable items...");
+        }
 
         (uint256 totalPrice, uint256 ethDeliveryFee) = getWeiPriceForOrder(restaurantAddr, itemIds, quantities, deliveryFee);
         require(msg.value >= totalPrice + ethDeliveryFee, "Incorrect amount paid");
@@ -201,6 +250,7 @@ contract FoodDelivery {
         require(order.status == OrderStatus.PENDING, "Can only accept orders for which the status is PENDING");
 
         order.status = OrderStatus.WAITING_COURIER;
+        ordersWaitingForCourier.push(orderId);
     }
 
     function declineOrder(uint256 orderId) public {
@@ -231,6 +281,8 @@ contract FoodDelivery {
         require(order.status == OrderStatus.WAITING_COURIER, "Order must be in the processing state");
         order.courierAddr = msg.sender;
         order.status = OrderStatus.ASSIGNED_COURIER;
+        couriersToOrdersMapping[msg.sender].push(order.id);
+        removeOrderFromWaitingList(orderId);
     }
 
     function orderReadyToDeliver(uint256 orderId) public {
@@ -315,6 +367,17 @@ contract FoodDelivery {
             return 0;
         } else {
             return totalRating / numberOfRatings;
+        }
+    }
+
+    function removeOrderFromWaitingList(uint256 orderId) internal {
+        for (uint256 i = 0; i < ordersWaitingForCourier.length; i++) {
+            if (ordersWaitingForCourier[i] == orderId) {
+                // Swap the order to remove with the last order in the array, then remove the last order
+                ordersWaitingForCourier[i] = ordersWaitingForCourier[ordersWaitingForCourier.length - 1];
+                ordersWaitingForCourier.pop();
+                break;
+            }
         }
     }
 }

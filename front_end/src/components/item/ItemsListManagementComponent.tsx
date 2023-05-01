@@ -25,7 +25,7 @@ export function ItemsListManagementComponent({
     <div>
       {items.map((item) => (
         <ItemManagementComponent
-          key={item.id}
+          key={`Item${item.id}`}
           item={item}
           restaurantAddress={restaurantAddress}
           contractAddress={contractAddress}

@@ -2,15 +2,12 @@ import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
 import { addToCart } from "../../shopping-cart/ShoppingCart";
 
-interface ItemComponentPropsProps {
+interface ItemComponentProps {
   restaurantAddress: string;
   item: Item;
 }
 
-export function ItemComponent({
-  restaurantAddress,
-  item,
-}: ItemComponentPropsProps) {
+export function ItemComponent({ restaurantAddress, item }: ItemComponentProps) {
   return (
     <div>
       <h2>

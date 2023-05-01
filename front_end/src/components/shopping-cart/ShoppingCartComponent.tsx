@@ -26,15 +26,18 @@ export function ShoppingCartComponent() {
   const [deliveryFee, setDeliveryFee] = useState(0);
   const contractAddress = useGetContractAddress();
 
-  const { state, placeOrder } = usePlaceOrder(contractAddress, {
-    orderId: undefined,
-    restaurantAddr: cartState.restaurantAddr,
-    itemIds: cartState.items.map((item) => item.id!),
-    quantities: Object.values(cartState.quantities),
-    deliveryFee: deliveryFee,
-    deliveryAddress: address,
-    orderStatus: OrderStatus.PENDING,
-  });
+  const { state, placeOrder } = usePlaceOrder(
+    contractAddress,
+    new Order(
+      undefined,
+      cartState.restaurantAddr,
+      cartState.items.map((item) => item.id!),
+      Object.values(cartState.quantities),
+      deliveryFee,
+      address,
+      OrderStatus.PENDING
+    )
+  );
 
   async function onClick_Order() {
     const itemIds: number[] = [];

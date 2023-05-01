@@ -3,6 +3,7 @@ import { Container } from "@material-ui/core";
 import { DAppProvider, Goerli } from "@usedapp/core";
 import { getDefaultProvider } from "ethers";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { CourierComponent } from "./components/courier/CourierComponent";
 import { Header } from "./components/Header";
 import { Main } from "./components/Main";
 import { OrderComponent } from "./components/order/OrderComponent";
@@ -69,6 +70,14 @@ const router = createBrowserRouter([
     element: (
       <Container>
         <Header /> <OrdersListComponent />{" "}
+      </Container>
+    ),
+  },
+  {
+    path: "/courier",
+    element: (
+      <Container>
+        <Header /> <CourierComponent />{" "}
       </Container>
     ),
   },

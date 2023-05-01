@@ -3,16 +3,7 @@ import { Contract, utils } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { alchemyGoerliProvider } from "../App";
-import { Order } from "../domain/Order";
-
-interface OrderData {
-  itemIndices: {
-    id: number;
-  }[];
-  quantities: number[];
-  deliveryFee: number;
-  deliveryAddress: string;
-}
+import { Order, OrderStatus } from "../domain/Order";
 
 export function useGetOrder(
   contractAddress: string,
@@ -28,29 +19,12 @@ export function useGetOrder(
         contractInterface,
         alchemyGoerliProvider
       );
-      const [itemIndices, quantities] =
-        await contract.callStatic.getOrderItemsAndQuantities(orderId);
 
-      const partialOrderData = await getOrder(contract, orderId);
+      const order = await getOrder(contract, orderId);
 
-      const orderData: OrderData = {
-        itemIndices,
-        quantities,
-        deliveryFee: partialOrderData!.deliveryFee,
-        deliveryAddress: partialOrderData!.deliveryAddress,
-      };
-
-      const order = new Order(
-        orderId,
-        contractAddress,
-        itemIndices,
-        quantities,
-        orderData.deliveryFee,
-        orderData.deliveryAddress,
-        partialOrderData!.orderStatus
-      );
-
-      setOrder(order);
+      if (order !== undefined) {
+        setOrder(order);
+      }
     };
 
     fetchOrderData();
@@ -64,7 +38,6 @@ export function useGetNumberOfOrders(
   clientAddress: string
 ) {
   const contractInterface = new utils.Interface(abi.abi);
-  console.log("Getting number of orders...");
   const { value, error } =
     useCall(
       contractAddress &&
@@ -95,7 +68,6 @@ export function useGetNumberOfOrdersForRestaurant(
   restaurantAddress: string
 ) {
   const contractInterface = new utils.Interface(abi.abi);
-  console.log("Getting number of orders...");
   const { value, error } =
     useCall(
       contractAddress &&
@@ -105,9 +77,65 @@ export function useGetNumberOfOrdersForRestaurant(
             contractInterface,
             alchemyGoerliProvider
           ),
-          method: "restaurantToOrdersIds",
+          method: "getNumberOfOrderForRestaurant",
           args: [restaurantAddress],
         }
+    ) ?? {};
+
+  if (error) {
+    console.error(`Error calling contract: ${error.message}`);
+    return undefined;
+  }
+
+  if (value !== undefined) {
+    return parseInt(value.toString());
+  }
+  return undefined;
+}
+
+export function useGetNumberOfOrdersForCourier(
+  contractAddress: string,
+  courierAddress: string
+) {
+  const contractInterface = new utils.Interface(abi.abi);
+  const { value, error } =
+    useCall(
+      contractAddress &&
+        courierAddress && {
+          contract: new Contract(
+            contractAddress,
+            contractInterface,
+            alchemyGoerliProvider
+          ),
+          method: "getNumberOfOrdersForCourier",
+          args: [courierAddress],
+        }
+    ) ?? {};
+
+  if (error) {
+    console.error(`Error calling contract: ${error.message}`);
+    return undefined;
+  }
+
+  if (value !== undefined) {
+    return parseInt(value.toString());
+  }
+  return undefined;
+}
+
+export function useGetNumberOfOrdersWaitingForCourier(contractAddress: string) {
+  const contractInterface = new utils.Interface(abi.abi);
+  const { value, error } =
+    useCall(
+      contractAddress && {
+        contract: new Contract(
+          contractAddress,
+          contractInterface,
+          alchemyGoerliProvider
+        ),
+        method: "getNumberOfOrdersWaitingForCourier",
+        args: [],
+      }
     ) ?? {};
 
   if (error) {
@@ -139,7 +167,6 @@ export const useGetOrders = (
 
       const restaurantArray = [];
       for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        console.log(`Fetching order ${orderIndex}...`);
         const orderId = await getOrderId(contract, clientAddress, orderIndex);
         const restaurant = await getOrder(contract, orderId);
         if (restaurant) {
@@ -162,7 +189,7 @@ export const useGetOrdersForRestaurant = (
   restaurantAddress: string,
   numberOfOrders: number
 ) => {
-  const [restaurants, setRestaurants] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -175,7 +202,6 @@ export const useGetOrdersForRestaurant = (
 
       const restaurantArray = [];
       for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        console.log(`Fetching order ${orderIndex}...`);
         const orderId = await getRestaurantOrderId(
           contract,
           restaurantAddress,
@@ -186,7 +212,7 @@ export const useGetOrdersForRestaurant = (
           restaurantArray.push(restaurant);
         }
       }
-      setRestaurants(restaurantArray);
+      setOrders(restaurantArray);
     };
 
     if (contractAddress && numberOfOrders > 0) {
@@ -194,7 +220,81 @@ export const useGetOrdersForRestaurant = (
     }
   }, [contractAddress, restaurantAddress, numberOfOrders]);
 
-  return restaurants;
+  return orders;
+};
+
+export const useGetOrdersForCourier = (
+  contractAddress: string,
+  courierAddress: string,
+  numberOfOrders: number
+) => {
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const contractInterface = new utils.Interface(abi.abi);
+      const contract = new Contract(
+        contractAddress,
+        contractInterface,
+        alchemyGoerliProvider
+      );
+
+      const restaurantArray = [];
+      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
+        const orderId = await getCourierOrderId(
+          contract,
+          courierAddress,
+          orderIndex
+        );
+        const restaurant = await getOrder(contract, orderId);
+        if (restaurant) {
+          restaurantArray.push(restaurant);
+        }
+      }
+      setOrders(restaurantArray);
+    };
+
+    if (contractAddress && numberOfOrders > 0) {
+      fetchOrders();
+    }
+  }, [contractAddress, courierAddress, numberOfOrders]);
+
+  return orders;
+};
+
+export const useGetWaitingForCourierOrders = (
+  contractAddress: string,
+  restaurantAddress: string,
+  numberOfOrders: number
+) => {
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const contractInterface = new utils.Interface(abi.abi);
+      const contract = new Contract(
+        contractAddress,
+        contractInterface,
+        alchemyGoerliProvider
+      );
+
+      const restaurantArray = [];
+      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
+        const orderId = await getWaitingForCourierOrderId(contract, orderIndex);
+        const restaurant = await getOrder(contract, orderId);
+        if (restaurant) {
+          restaurantArray.push(restaurant);
+        }
+      }
+      setOrders(restaurantArray);
+    };
+
+    if (contractAddress && numberOfOrders > 0) {
+      fetchRestaurants();
+    }
+  }, [contractAddress, restaurantAddress, numberOfOrders]);
+
+  return orders;
 };
 
 async function getOrderId(
@@ -231,19 +331,55 @@ async function getRestaurantOrderId(
   }
 }
 
+async function getCourierOrderId(
+  contract: Contract,
+  courierAddress: string,
+  index: number
+) {
+  try {
+    const value = await contract.callStatic.couriersToOrdersMapping(
+      courierAddress,
+      index
+    );
+    return value;
+  } catch (error: any) {
+    console.error(`Error calling contract: ${error.toString()}`);
+    return undefined;
+  }
+}
+
+async function getWaitingForCourierOrderId(contract: Contract, index: number) {
+  try {
+    const value = await contract.callStatic.ordersWaitingForCourier(index);
+    return value;
+  } catch (error: any) {
+    console.error(`Error calling contract: ${error.toString()}`);
+    return undefined;
+  }
+}
+
 async function getOrder(contract: Contract, orderId: number) {
   try {
     const order = await contract.callStatic.orders(orderId);
+
     if (order !== undefined) {
-      return new Order(
-        order.id,
-        order.restaurantAddr,
+      const [items, quantities] =
+        await contract.callStatic.getOrderItemsAndQuantities(orderId);
+
+      //   console.log("@##" + quantities);
+
+      const result = new Order(
+        orderId,
+        order!.restaurantAddr,
         undefined,
-        undefined,
+        quantities,
         order.deliveryFee,
         order.deliveryAddress,
-        order.status
+        order!.status
       );
+      result.items = items;
+
+      return result;
     } else {
       console.error(`Invalid response from contract: ${JSON.stringify(order)}`);
       return undefined;
@@ -266,19 +402,17 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
   });
 
   const placeOrder = async (order: Order) => {
-    console.log(contractAddress);
-    console.log(order.restaurantAddr);
-    console.log(order.itemIds);
-    console.log(order.quantities);
-    console.log(order.deliveryFee);
+    // console.log(contractAddress);
+    // console.log(order.restaurantAddr);
+    // console.log(order.itemIds);
+    // console.log(order.quantities);
+    // console.log(order.deliveryFee);
     const { 0: totalPrice } = await contract.getWeiPriceForOrder(
       order.restaurantAddr,
       order.itemIds,
       order.quantities,
       order.deliveryFee
     );
-
-    console.log(totalPrice);
 
     const valueToSend = totalPrice.add(order.deliveryFee) + 10;
 
@@ -295,4 +429,61 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
   };
 
   return { state, placeOrder };
+}
+
+export function useChangeOrderStatus(
+  contractAddress: string,
+  toStatus: OrderStatus
+) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  let methodName: string = "";
+  let transactionName: string = "";
+
+  switch (toStatus) {
+    case OrderStatus.WAITING_COURIER:
+      methodName = "acceptOrder";
+      transactionName = "AcceptOrder";
+      break;
+    case OrderStatus.ASSIGNED_COURIER:
+      methodName = "takeOrder";
+      transactionName = "TakeOrder";
+      break;
+    case OrderStatus.READY_TO_DELIVER:
+      methodName = "orderReadyToDeliver";
+      transactionName = "ReadyToDeliver";
+      break;
+    case OrderStatus.DELIVERING:
+      methodName = "orderDelivering";
+      transactionName = "Delivering";
+      break;
+    case OrderStatus.DELIVERED:
+      methodName = "orderDelivered";
+      transactionName = "OrderDelivered";
+      break;
+  }
+
+  if (toStatus === OrderStatus.WAITING_COURIER) {
+    methodName = "acceptOrder";
+    transactionName = "AcceptOrder";
+  }
+
+  const { state, send } = useContractFunction(contract, methodName!, {
+    transactionName: transactionName,
+  });
+
+  const changeStatus = async (orderId: number) => {
+    // console.log(contractAddress);
+    // console.log(order.restaurantAddr);
+    // console.log(order.itemIds);
+    // console.log(order.quantities);
+    // console.log(order.deliveryFee);
+    send(orderId);
+  };
+
+  return { state, changeStatus };
 }

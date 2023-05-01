@@ -4,7 +4,7 @@ import { Restaurant } from "../../domain/Restaurant";
 import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { ItemComponent } from "./ItemComponent";
 
-interface ItemsListComponentPropsProps {
+interface ItemsListComponentProps {
   contractAddress: string;
   restaurantAddress: string;
 }
@@ -12,7 +12,7 @@ interface ItemsListComponentPropsProps {
 export function ItemsListComponent({
   contractAddress,
   restaurantAddress,
-}: ItemsListComponentPropsProps) {
+}: ItemsListComponentProps) {
   const numberOfItems = useGetNumberOfItemsInMenu(
     contractAddress,
     restaurantAddress
@@ -21,13 +21,16 @@ export function ItemsListComponent({
 
   return (
     <div>
-      {items.map((item) => (
-        <ItemComponent
-          key={item.id}
-          item={item}
-          restaurantAddress={restaurantAddress}
-        />
-      ))}
+      {items.map(
+        (item) =>
+          item.available && (
+            <ItemComponent
+              key={item.id}
+              item={item}
+              restaurantAddress={restaurantAddress}
+            />
+          )
+      )}
     </div>
   );
 }

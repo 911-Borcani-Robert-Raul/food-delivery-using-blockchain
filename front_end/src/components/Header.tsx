@@ -23,6 +23,7 @@ export const Header = () => {
       <Link to={"/shoppingCart"}>Shopping Cart</Link>
       <Link to={"/orders"}>Orders</Link>
       <Link to={"/restaurant/manage"}>Manage restaurant</Link>
+      <Link to={"/courier"}>Courier section</Link>
       <div>
         {isConnected ? (
           <div>

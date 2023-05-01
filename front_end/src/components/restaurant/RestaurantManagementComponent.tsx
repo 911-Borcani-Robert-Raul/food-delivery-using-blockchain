@@ -6,6 +6,7 @@ import { useGetRestaurant } from "../../hooks/RestaurantHooks";
 import { ItemsListComponent } from "../item/ItemsListComponent";
 import { ItemsListManagementComponent } from "../item/ItemsListManagementComponent";
 import { useGetContractAddress } from "../Main";
+import { RestaurantOrdersComponent } from "./RestaurantOrdersComponent";
 
 export function RestaurantManagementComponent() {
   const contractAddr = useGetContractAddress();
@@ -37,11 +38,12 @@ export function RestaurantManagementComponent() {
             {showItems ? "Hide Items" : "Show Items"}
           </button>
           {showItems && (
-            <ItemsListComponent
+            <ItemsListManagementComponent
               contractAddress={contractAddr}
               restaurantAddress={restaurantAddress!}
             />
           )}
+          <RestaurantOrdersComponent />
         </div>
       )}
     </div>

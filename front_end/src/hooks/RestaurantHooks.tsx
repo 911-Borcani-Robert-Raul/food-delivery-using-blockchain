@@ -17,7 +17,6 @@ export function useGetRestaurant(contractAddress: string, address: string) {
         alchemyGoerliProvider
       );
 
-      console.log(`Fetching restaurant ${address}...`);
       const restaurant = await getRestaurant(
         contract,
         contractAddress,
@@ -36,7 +35,6 @@ export function useGetRestaurant(contractAddress: string, address: string) {
 
 export function useGetNumberOfRestaurants(contractAddress: string | Falsy) {
   const contractInterface = new utils.Interface(abi.abi);
-  console.log("Getting number of restaurants...");
   const { value, error } =
     useCall(
       contractAddress && {
@@ -116,7 +114,6 @@ export const useGetRestaurants = (
           contractAddress,
           restaurantIndex
         );
-        console.log(`Fetching restaurant ${restaurantAddr}...`);
         const restaurant = await getRestaurant(
           contract,
           contractAddress,
@@ -135,7 +132,7 @@ export const useGetRestaurants = (
   }, [contractAddress, numberOfRestaurants]);
 
   return restaurants;
-}
+};
 
 async function getRestaurantAddress(
   contract: Contract,
