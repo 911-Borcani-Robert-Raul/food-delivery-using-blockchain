@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.13;
 
-import "AggregatorV3Interface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract FoodDelivery {
     struct Item{
@@ -46,6 +46,11 @@ contract FoodDelivery {
         uint256 totalPrice;         // total price is in GWei
         string deliveryAddress;
         OrderStatus status;
+        uint256 maxPreparationTime;     // in seconds
+        uint256 maxDeliveryTime;        // in seconds
+        uint256 preparationStartTime;   // timestamp
+        uint256 deliveryStartTime;      // timestamp
+        uint256 refundAmount;           // amount to refund if thresholds exceeded
     }
 
     struct Review {
@@ -237,18 +242,25 @@ contract FoodDelivery {
             deliveryFee: ethDeliveryFee,
             totalPrice: totalPrice,
             deliveryAddress: deliveryAddress,
-            status: OrderStatus.PENDING
+            status: OrderStatus.PENDING,
+            maxPreparationTime: 0,
+            maxDeliveryTime: 0,
+            preparationStartTime: 0,
+            deliveryStartTime: 0,
+            refundAmount: 0
         }));
         clientsToOrdersMapping[msg.sender].push(id);
         restaurantToOrdersIds[restaurantAddr].push(id);
     }
 
-    function acceptOrder(uint256 orderId) public {
+    function acceptOrder(uint256 orderId, uint256 maxPreparationTime) public {
         Order storage order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
         require(order.restaurantAddr == msg.sender, "Only the restaurant for which the order was made can accept it");
         require(order.status == OrderStatus.PENDING, "Can only accept orders for which the status is PENDING");
 
+        order.maxPreparationTime = maxPreparationTime;
+        order.preparationStartTime = block.timestamp;
         order.status = OrderStatus.WAITING_COURIER;
         ordersWaitingForCourier.push(orderId);
     }
@@ -275,11 +287,13 @@ contract FoodDelivery {
         order.deliveryFee += msg.value;
     }
 
-    function takeOrder(uint256 orderId) public {
+    function takeOrder(uint256 orderId, uint256 maxDeliveryTime) public {
         Order storage order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
         require(order.status == OrderStatus.WAITING_COURIER, "Order must be in the processing state");
         order.courierAddr = msg.sender;
+        order.maxDeliveryTime = maxDeliveryTime;
+        order.deliveryStartTime = block.timestamp;
         order.status = OrderStatus.ASSIGNED_COURIER;
         couriersToOrdersMapping[msg.sender].push(order.id);
         removeOrderFromWaitingList(orderId);
@@ -308,6 +322,36 @@ contract FoodDelivery {
         require(order.id == orderId, "Order with given id does not exist");
         require(order.status == OrderStatus.DELIVERING);
         require(order.clientAddr == msg.sender, "Order delivery must be confirmed by client");
+
+        uint256 preparationTime = order.deliveryStartTime - order.preparationStartTime;
+        uint256 deliveryTime = block.timestamp - order.deliveryStartTime;
+        uint256 totalPayment = order.totalPrice + order.deliveryFee;
+        uint256 refundAmount = 0;
+
+        uint256 restaurantRefund = 0;
+        uint256 courierRefund = 0;
+
+        uint256 fixedLateFeePercentage = 10; // Fixed late fee percentage (e.g., 10%)
+
+        // Calculate the refund amounts based on delays
+        if (preparationTime > order.maxPreparationTime) {
+            restaurantRefund = (fixedLateFeePercentage * order.totalPrice) / 100;
+        }
+
+        if (deliveryTime > order.maxDeliveryTime) {
+            courierRefund = (fixedLateFeePercentage * order.deliveryFee) / 100;
+        }
+
+        // Proportional payments to restaurant and courier
+        address payable restaurantAddr = payable(order.restaurantAddr);
+        address payable courierAddr = payable(order.courierAddr);
+        address payable clientAddr = payable(order.clientAddr);
+        uint256 restaurantPayment = order.totalPrice - restaurantRefund;
+        uint256 courierPayment = order.deliveryFee - courierRefund;
+        
+        require(restaurantAddr.send(restaurantPayment), "Failed to send payment to restaurant");
+        require(courierAddr.send(courierPayment), "Failed to send payment to courier");
+        require(clientAddr.send(restaurantRefund + courierRefund), "Failed to send payment to client");
 
         order.status = OrderStatus.DELIVERED;
     }
