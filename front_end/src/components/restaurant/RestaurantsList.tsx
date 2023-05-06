@@ -5,6 +5,7 @@ import {
 } from "../../hooks/RestaurantHooks";
 import { useGetContractAddress } from "../Main";
 import { RestaurantLinkComponent } from "./ReataurantLinkComponent";
+import { Box, Grid, GridItem } from "@chakra-ui/react";
 
 export const RestaurantsList = React.memo(() => {
   const contractAddress = useGetContractAddress();
@@ -13,16 +14,15 @@ export const RestaurantsList = React.memo(() => {
 
   console.log("RestaurantComponent render");
   return (
-    <div>
+    <Box>
       <div>There are {numberOfRestaurants} restaurants.</div>
-      <div>
+      <Grid templateColumns="repeat(3, 1fr)" gap={6}>
         {restaurants.map((restaurant) => (
-          <RestaurantLinkComponent
-            key={restaurant.addr}
-            restaurant={restaurant}
-          />
+          <GridItem key={restaurant.addr}>
+            <RestaurantLinkComponent restaurant={restaurant} />
+          </GridItem>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
 });

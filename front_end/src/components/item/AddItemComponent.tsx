@@ -1,11 +1,21 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { Contract } from "ethers";
 import { useEffect, useState } from "react";
 import { alchemyGoerliProvider } from "../../App";
 import { Item } from "../../domain/Item";
 import abi from "../../chain-info/contracts/FoodDelivery.json";
-import { useAddItem, useUpdateItem } from "../../hooks/ItemHooks";
+import { useAddItem } from "../../hooks/ItemHooks";
 
-interface ItemComponentProps {
+interface AddItemComponentProps {
   contractAddress: string;
   restaurantAddress: string;
 }
@@ -13,7 +23,7 @@ interface ItemComponentProps {
 export function AddItemComponent({
   contractAddress,
   restaurantAddress,
-}: ItemComponentProps) {
+}: AddItemComponentProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
@@ -39,34 +49,36 @@ export function AddItemComponent({
   }, [state]);
 
   return (
-    <div>
+    <Box>
       <form onSubmit={handleSubmit}>
-        <label>
-          Name:
-          <input
+        <FormControl mb="3">
+          <FormLabel>Name:</FormLabel>
+          <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-        </label>
-        <label>
-          Description:
-          <textarea
+        </FormControl>
+        <FormControl mb="3">
+          <FormLabel>Description:</FormLabel>
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-        </label>
-        <label>
-          Price:
-          <input
+        </FormControl>
+        <FormControl mb="3">
+          <FormLabel>Price:</FormLabel>
+          <Input
             type="number"
             value={price}
             onChange={(e) => setPrice(parseFloat(e.target.value))}
           />
-        </label>
-        <button type="submit">Add</button>
+        </FormControl>
+        <Button colorScheme="teal" type="submit" mb="3">
+          Add
+        </Button>
       </form>
-      {progress && <p>{progress}</p>}
-    </div>
+      {progress && <Text>{progress}</Text>}
+    </Box>
   );
 }

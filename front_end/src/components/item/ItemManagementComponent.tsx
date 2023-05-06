@@ -1,3 +1,13 @@
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { Contract } from "ethers";
 import { useEffect, useState } from "react";
 import { alchemyGoerliProvider } from "../../App";
@@ -93,48 +103,69 @@ export function ItemManagementComponent({
   }, [state]);
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label>
-          Description:
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </label>
-        <label>
-          Price:
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(parseFloat(e.target.value))}
-          />
-        </label>
-        <button type="submit">Update</button>
-      </form>
-      {progress && <p>{progress}</p>}
+    <Box p={4} bg="white" borderRadius={5} boxShadow="md" mb={4}>
+      <FormControl onSubmit={handleSubmit}>
+        <FormLabel>Name:</FormLabel>
+        <Input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          mb={2}
+        />
+        <FormLabel>Description:</FormLabel>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          mb={2}
+        />
+        <FormLabel>Price:</FormLabel>
+        <Input
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(parseFloat(e.target.value))}
+          mb={2}
+        />
+        <Button type="submit" colorScheme="blue" size="sm">
+          Update
+        </Button>
+      </FormControl>
+      {progress && (
+        <Text fontWeight="bold" color="green.500" mt={2}>
+          {progress}
+        </Text>
+      )}
 
       {item.available && (
-        <div>
-          <button onClick={onClick_disableItem}>Disable item</button>
-          <p>{disableTransactionStatus}</p>
-        </div>
+        <Box mt={4}>
+          <Button
+            onClick={onClick_disableItem}
+            colorScheme="red"
+            size="sm"
+            mr={2}
+          >
+            Disable item
+          </Button>
+          <Text fontWeight="bold" color="red.500" display="inline">
+            {disableTransactionStatus}
+          </Text>
+        </Box>
       )}
 
       {!item.available && (
-        <div>
-          <button onClick={onClick_enableItem}>Enable item</button>
-          <p>{enableTransactionStatus}</p>
-        </div>
+        <Box mt={4}>
+          <Button
+            onClick={onClick_enableItem}
+            colorScheme="green"
+            size="sm"
+            mr={2}
+          >
+            Enable item
+          </Button>
+          <Text fontWeight="bold" color="green.500" display="inline">
+            {enableTransactionStatus}
+          </Text>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }

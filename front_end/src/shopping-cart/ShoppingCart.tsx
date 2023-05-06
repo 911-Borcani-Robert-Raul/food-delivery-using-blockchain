@@ -11,7 +11,6 @@ export interface CartState {
 export function getCartState(): CartState {
   const storedState = localStorage.getItem("cart");
 
-  // localStorage.clear();
   if (storedState) {
     const result: CartState = JSON.parse(storedState);
     return result;

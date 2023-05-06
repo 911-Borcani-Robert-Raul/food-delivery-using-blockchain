@@ -9,6 +9,7 @@ import {
 import { useGetContractAddress } from "../Main";
 import { OrderLinkComponent } from "../order/OrderLinkComponent";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
+import { Box, Heading } from "@chakra-ui/react";
 
 export const RestaurantOrdersComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
@@ -31,24 +32,22 @@ export const RestaurantOrdersComponent = React.memo(() => {
     (order) => order.orderStatus === OrderStatus.ASSIGNED_COURIER
   );
 
-  const { state: acceptOrderState, changeStatus: acceptOrderSend } =
-    useChangeOrderStatus(contractAddress, OrderStatus.WAITING_COURIER);
-
-  async function onClick_acceptOrder(orderId: number) {
-    await acceptOrderSend(orderId);
-  }
-
   return (
-    <div>
-      <h2>Pending orders</h2>
+    <Box>
+      <Heading as="h2" size="md">
+        Pending orders
+      </Heading>
       <OrdersListComponentForStatusChange
         contractAddress={contractAddress}
         ordersList={pendingOrders}
         newStatus={OrderStatus.WAITING_COURIER}
         statusChangeActionName={"Accept order"}
+        allowTimeDuration={true}
       />
 
-      <h2>Orders being prepared</h2>
+      <Heading as="h2" size="md">
+        Orders being prepared
+      </Heading>
       <OrdersListComponentForStatusChange
         contractAddress={contractAddress}
         ordersList={assignedCourierOrders}
@@ -56,28 +55,28 @@ export const RestaurantOrdersComponent = React.memo(() => {
         statusChangeActionName={"Order is finished"}
       />
 
-      {/* <div>You have {numberOfOrders} orders.</div>
-      <div>
+      {/* <Box>You have {numberOfOrders} orders.</Box>
+      <Box>
         {orders.map((order) => (
-          <div key={`Order:${order.orderId}`}>
+          <Box key={`Order:${order.orderId}`}>
             <OrderLinkComponent order={order} />
             {order!.items?.map((item) => (
-              <div key={`Item:${item}`}>{item.toString()}</div>
+              <Box key={`Item:${item}`}>{item.toString()}</Box>
             ))}
             {order!.quantities?.map((quantity, index) => (
-              <div key={`Quantity:${index}`}>{quantity.toString()}</div>
+              <Box key={`Quantity:${index}`}>{quantity.toString()}</Box>
             ))}
             {order.orderStatus === OrderStatus.PENDING && (
-              <div>
-                <button onClick={() => onClick_acceptOrder(order.orderId!)}>
+              <Box>
+                <Button onClick={() => onClick_acceptOrder(order.orderId!)}>
                   Accept order
-                </button>
-              </div>
+                </Button>
+              </Box>
             )}
-            <div>Order status: {getOrderStatusString(order.orderStatus)}</div>
-          </div>
+            <Box>Order status: {getOrderStatusString(order.orderStatus)}</Box>
+          </Box>
         ))}
-      </div> */}
-    </div>
+      </Box> */}
+    </Box>
   );
 });

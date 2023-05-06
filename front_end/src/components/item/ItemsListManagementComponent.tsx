@@ -5,6 +5,7 @@ import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { AddItemComponent } from "./AddItemComponent";
 import { ItemComponent } from "./ItemComponent";
 import { ItemManagementComponent } from "./ItemManagementComponent";
+import { Box, Heading, SimpleGrid, Text, VStack } from "@chakra-ui/react";
 
 interface ItemsListComponentProps {
   contractAddress: string;
@@ -22,21 +23,27 @@ export function ItemsListManagementComponent({
   const items = useGetItems(contractAddress, restaurantAddress, numberOfItems!);
 
   return (
-    <div>
-      {items.map((item) => (
-        <ItemManagementComponent
-          key={`Item${item.id}`}
-          item={item}
+    <Box>
+      <SimpleGrid columns={[1, 2, 3]} spacing={8} mt={8}>
+        {items.map((item) => (
+          <ItemManagementComponent
+            key={`Item${item.id}`}
+            item={item}
+            restaurantAddress={restaurantAddress}
+            contractAddress={contractAddress}
+          />
+        ))}
+      </SimpleGrid>
+      <VStack mt={8} spacing={4}>
+        <Heading as="h3" size="md">
+          Add Item
+        </Heading>
+        <AddItemComponent
+          key="addItem"
           restaurantAddress={restaurantAddress}
           contractAddress={contractAddress}
         />
-      ))}
-      <h3>Add item</h3>
-      <AddItemComponent
-        key="addItem"
-        restaurantAddress={restaurantAddress}
-        contractAddress={contractAddress}
-      />
-    </div>
+      </VStack>
+    </Box>
   );
 }

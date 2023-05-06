@@ -5,8 +5,11 @@ import { useGetOrder } from "../../hooks/OrderHooks";
 import { useGetOrderReview, usePlaceReview } from "../../hooks/ReviewHooks";
 import { useGetContractAddress } from "../Main";
 import { CreateReviewComponent } from "../review/CreateReviewComponent";
+import { Box, Button, Text } from "@chakra-ui/react";
 
-export function OrderComponent() {
+interface Props {}
+
+export function OrderComponent(props: Props) {
   const contractAddr = useGetContractAddress();
   const { orderIdString } = useParams();
   const orderId = parseInt(orderIdString!);
@@ -20,34 +23,49 @@ export function OrderComponent() {
   }
 
   return (
-    <div>
+    <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
       {order && (
-        <div>
-          <div>{order.restaurantAddr}</div>
-          <div>{order.deliveryAddress}</div>
-          <div>{order.orderStatus}</div>
-
-          <div>Order status: {getOrderStatusString(order.orderStatus)}</div>
+        <Box>
+          <Text fontSize="xl" fontWeight="bold">
+            {order.restaurantAddr}
+          </Text>
+          <Text>{order.deliveryAddress}</Text>
+          <Text>Order status: {getOrderStatusString(order.orderStatus)}</Text>
 
           {review && (
-            <div>
-              <h2>Review</h2>
-              <div>Rating {review.rating}</div>
-              <div>
-                <h4>Comment</h4>
-                {review.comment}
-              </div>
-            </div>
+            <Box mt={2}>
+              <Text fontSize="lg" fontWeight="bold">
+                Review
+              </Text>
+              <Text>Rating: {review.rating}</Text>
+              <Text>
+                <strong>Comment:</strong> {review.comment}
+              </Text>
+            </Box>
           )}
 
           {!review && (
-            <div>
-              <h2>Give a review for this order!</h2>
+            <Box mt={2}>
+              <Text fontSize="lg" fontWeight="bold">
+                Give a review for this order!
+              </Text>
               <CreateReviewComponent onSubmit={sendReview} />
-            </div>
+            </Box>
           )}
-        </div>
+
+          {order.orderStatus === OrderStatus.DELIVERED && (
+            <Button
+              as="a"
+              href={`/order/${orderId}/review`}
+              variant="solid"
+              colorScheme="blue"
+              mt={2}
+            >
+              Edit Review
+            </Button>
+          )}
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }

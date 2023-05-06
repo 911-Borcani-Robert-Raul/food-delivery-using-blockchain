@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chakra-ui/react": "^2.6.1",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
     "@material-ui/core": "^4.12.4",
     "@mui/material": "^5.11.13",
     "@mui/styled-engine-sc": "^5.11.11",
@@ -16,6 +19,7 @@
     "@usedapp/core": "^1.2.7",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
+    "framer-motion": "^10.12.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.9.0",

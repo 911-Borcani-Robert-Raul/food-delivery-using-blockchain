@@ -1,5 +1,5 @@
 import { useCall, useContractFunction, useEthers } from "@usedapp/core";
-import { Contract, utils } from "ethers";
+import { Contract, ethers, utils } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { alchemyGoerliProvider } from "../App";
@@ -407,14 +407,17 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
     // console.log(order.itemIds);
     // console.log(order.quantities);
     // console.log(order.deliveryFee);
-    const { 0: totalPrice } = await contract.getWeiPriceForOrder(
-      order.restaurantAddr,
-      order.itemIds,
-      order.quantities,
-      order.deliveryFee
-    );
+    const { 0: totalPrice, 1: ethDeliveryFee } =
+      await contract.getWeiPriceForOrder(
+        order.restaurantAddr,
+        order.itemIds,
+        order.quantities,
+        order.deliveryFee
+      );
 
-    const valueToSend = totalPrice.add(order.deliveryFee) + 10;
+    const valueToSend = totalPrice.add(ethDeliveryFee);
+    const valueToSendString = valueToSend.toString(); // convert to string
+    const valueToSendWei = ethers.utils.parseUnits(valueToSendString, "wei"); // convert to BigNumber
 
     send(
       order.restaurantAddr,
@@ -423,7 +426,7 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
       order.deliveryFee,
       order.deliveryAddress,
       {
-        value: valueToSend,
+        value: valueToSendWei,
       }
     );
   };
@@ -476,13 +479,20 @@ export function useChangeOrderStatus(
     transactionName: transactionName,
   });
 
-  const changeStatus = async (orderId: number) => {
+  const changeStatus = async (
+    orderId: number,
+    durationSeconds: number | undefined
+  ) => {
     // console.log(contractAddress);
     // console.log(order.restaurantAddr);
     // console.log(order.itemIds);
     // console.log(order.quantities);
     // console.log(order.deliveryFee);
-    send(orderId);
+    if (durationSeconds) {
+      send(orderId, durationSeconds);
+    } else {
+      send(orderId);
+    }
   };
 
   return { state, changeStatus };

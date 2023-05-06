@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useEthers } from "@usedapp/core";
-import { useParams } from "react-router-dom";
-import { useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { useGetRestaurant } from "../../hooks/RestaurantHooks";
-import { ItemsListComponent } from "../item/ItemsListComponent";
 import { ItemsListManagementComponent } from "../item/ItemsListManagementComponent";
 import { useGetContractAddress } from "../Main";
 import { RestaurantOrdersComponent } from "./RestaurantOrdersComponent";
+import { RegisterRestaurantComponent } from "./RegisterRestaurantForm";
+import { Restaurant } from "../../domain/Restaurant";
+import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 
 export function RestaurantManagementComponent() {
   const contractAddr = useGetContractAddress();
@@ -22,30 +22,39 @@ export function RestaurantManagementComponent() {
   };
 
   return (
-    <div>
+    <Box py={8} px={4} maxW="2xl" mx="auto">
       {restaurant === undefined && (
-        <div>
-          <button>Register restaurant</button>
-        </div>
+        <Box>
+          <Heading as="h2" size="md" mb={4}>
+            Register restaurant
+          </Heading>
+          <RegisterRestaurantComponent contractAddress={contractAddr} />
+        </Box>
       )}
 
       {restaurant && (
-        <div>
-          <h1>{restaurant.name}</h1>
-          <p>{restaurant.addr}</p>
-          <p>{restaurant.description}</p>
-          <button onClick={handleShowItems}>
-            {showItems ? "Hide Items" : "Show Items"}
-          </button>
-          {showItems && (
-            <ItemsListManagementComponent
-              contractAddress={contractAddr}
-              restaurantAddress={restaurantAddress!}
-            />
-          )}
-          <RestaurantOrdersComponent />
-        </div>
+        <Stack spacing={8}>
+          <Box>
+            <Heading as="h1" size="xl">
+              {restaurant.name}
+            </Heading>
+            <Text mb={2}>{restaurant.addr}</Text>
+            <Text mb={4}>{restaurant.description}</Text>
+            <Button onClick={handleShowItems}>
+              {showItems ? "Hide Items" : "Show Items"}
+            </Button>
+            {showItems && (
+              <ItemsListManagementComponent
+                contractAddress={contractAddr}
+                restaurantAddress={restaurantAddress!}
+              />
+            )}
+          </Box>
+          <Box>
+            <RestaurantOrdersComponent />
+          </Box>
+        </Stack>
       )}
-    </div>
+    </Box>
   );
 }

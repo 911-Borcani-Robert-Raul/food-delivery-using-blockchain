@@ -7,10 +7,11 @@ import { CourierComponent } from "./components/courier/CourierComponent";
 import { Header } from "./components/Header";
 import { Main } from "./components/Main";
 import { OrderComponent } from "./components/order/OrderComponent";
-import { OrdersListComponent } from "./components/order/OrdersListComponent";
 import { RestaurantComponent } from "./components/restaurant/RestaurantComponent";
 import { RestaurantManagementComponent } from "./components/restaurant/RestaurantManagementComponent";
 import { ShoppingCartComponent } from "./components/shopping-cart/ShoppingCartComponent";
+import { ChakraProvider } from "@chakra-ui/react";
+import OrdersListComponent from "./components/order/OrdersListComponent";
 
 const alchemyApiKey = "";
 const alchemyUrl = `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`;
@@ -89,22 +90,24 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <DAppProvider
-      config={{
-        readOnlyChainId: Goerli.chainId,
-        readOnlyUrls: {
-          [Goerli.chainId]: alchemyGoerliProvider,
-          5777: getDefaultProvider("http://localhost:7545"),
-        },
-        notifications: {
-          expirationPeriod: 1000,
-          checkInterval: 1000,
-        },
-        refresh: 10,
-      }}
-    >
-      <RouterProvider router={router} />
-    </DAppProvider>
+    <ChakraProvider>
+      <DAppProvider
+        config={{
+          readOnlyChainId: Goerli.chainId,
+          readOnlyUrls: {
+            [Goerli.chainId]: alchemyGoerliProvider,
+            5777: getDefaultProvider("http://localhost:7545"),
+          },
+          notifications: {
+            expirationPeriod: 1000,
+            checkInterval: 1000,
+          },
+          refresh: 10,
+        }}
+      >
+        <RouterProvider router={router} />
+      </DAppProvider>
+    </ChakraProvider>
   );
 }
 

@@ -2,8 +2,21 @@ import { constants } from "ethers";
 import { useEffect, useState } from "react";
 import { Order, OrderStatus } from "../../domain/Order";
 import { usePlaceOrder } from "../../hooks/OrderHooks";
-import { CartState, getCartState } from "../../shopping-cart/ShoppingCart";
+import {
+  CartState,
+  clearShoppingCart,
+  getCartState,
+} from "../../shopping-cart/ShoppingCart";
 import { useGetContractAddress } from "../Main";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 
 export function ShoppingCartComponent() {
   const [cartState, setCartState] = useState<CartState>({
@@ -71,49 +84,73 @@ export function ShoppingCartComponent() {
       setTransactionStatus("");
     }
   }, [state]);
-
   return (
-    <div>
-      <h2>Shopping Cart</h2>
+    <Box p={6} bg="white" boxShadow="sm" borderRadius="lg">
+      <Text fontSize="2xl" fontWeight="semibold" mb={4}>
+        Shopping Cart
+      </Text>
       {cartState.items.length === 0 ? (
-        <p>Your cart is empty</p>
+        <Text>Your cart is empty</Text>
       ) : (
         <div>
-          <ul>
-            {cartState.items.map((item) => (
-              <li key={item.id}>
-                {item.name} ({cartState.quantities[item.id!]}) - $
+          {cartState.items.map((item) => (
+            <Box
+              key={item.id}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              py={2}
+              borderBottom="1px"
+              borderColor="gray.300"
+            >
+              <Text fontWeight="semibold" fontSize="lg">
+                {item.name} ({cartState.quantities[item.id!]})
+              </Text>
+              <Text fontSize="lg" color="gray.600">
                 {typeof item.price === "number"
-                  ? `${item.price.toFixed(2)}`
+                  ? `$${item.price.toFixed(2)}`
                   : "N/A"}
-              </li>
-            ))}
-          </ul>
-          <div>Total price is {totalPrice.toFixed(2)}.</div>
-          <form>
-            <label htmlFor="address">Address:</label>
-            <input
-              id="address"
-              title="Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <br />
-            <label htmlFor="delivery-fee">Delivery Fee:</label>
-            <input
-              id="delivery-fee"
-              title="Delivery Fee"
-              value={deliveryFee}
-              onChange={(e) => setDeliveryFee(parseInt(e.target.value))}
-              type="number"
-            />
-          </form>
-
-          <button onClick={onClick_Order}>Order</button>
-
-          <div>{transactionStatus}</div>
+              </Text>
+            </Box>
+          ))}
+          <Text fontSize="xl" fontWeight="semibold" mt={4}>
+            Total price is ${totalPrice.toFixed(2)}
+          </Text>
+          <VStack spacing={4} mt={6}>
+            <FormControl id="address">
+              <FormLabel>Address:</FormLabel>
+              <Input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="delivery-fee">
+              <FormLabel>Delivery Fee:</FormLabel>
+              <Input
+                type="number"
+                value={deliveryFee}
+                onChange={(e) => setDeliveryFee(parseInt(e.target.value))}
+              />
+            </FormControl>
+            <Button colorScheme="teal" onClick={onClick_Order}>
+              Order
+            </Button>
+            <Button
+              variant="outline"
+              colorScheme="teal"
+              onClick={clearShoppingCart}
+            >
+              Clear shopping cart
+            </Button>
+          </VStack>
+          {transactionStatus && (
+            <Text mt={4} fontSize="md" color="gray.600">
+              {transactionStatus}
+            </Text>
+          )}
         </div>
       )}
-    </div>
+    </Box>
   );
 }

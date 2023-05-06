@@ -11,6 +11,7 @@ import {
 import { useGetContractAddress } from "../Main";
 import { OrderLinkComponent } from "../order/OrderLinkComponent";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
+import { Box, Button, Flex, Heading, HStack, Text } from "@chakra-ui/react";
 
 export const WaitingForCourierOrderListComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
@@ -25,18 +26,15 @@ export const WaitingForCourierOrderListComponent = React.memo(() => {
   const { state: takeOrderState, changeStatus: takeOrderSend } =
     useChangeOrderStatus(contractAddress, OrderStatus.ASSIGNED_COURIER);
 
-  async function onClick_acceptOrder(orderId: number) {
-    await takeOrderSend(orderId);
-  }
-
   return (
-    <div>
+    <Box>
       <OrdersListComponentForStatusChange
         contractAddress={contractAddress}
         ordersList={orders}
         newStatus={OrderStatus.ASSIGNED_COURIER}
         statusChangeActionName={"Take order"}
+        allowTimeDuration={true}
       />
-    </div>
+    </Box>
   );
 });

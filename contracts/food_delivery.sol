@@ -17,6 +17,7 @@ contract FoodDelivery {
         address addr;
         string name;
         string description;
+        string physicalAddress;
         Item[] items;
     }
 
@@ -126,10 +127,11 @@ contract FoodDelivery {
         return ordersWaitingForCourier.length;
     }
 
+    // Gets the price in GWei
     function getPriceInEth(uint256 usdPrice) public view returns (uint256) {
         (,int256 price,,, ) = ethUsdPriceFeed.latestRoundData();
         uint8 decimals = ethUsdPriceFeed.decimals();
-        uint256 cost = (usdPrice * 10 ** decimals) / (uint256(price) / 10 ** 9);
+        uint256 cost = (usdPrice * 10 ** (decimals + 18)) / (uint256(price));
         return cost;
     }
 
@@ -153,11 +155,12 @@ contract FoodDelivery {
         return (orderedItems, order.quantities);
     }
 
-    function registerRestaurant(string calldata name, string calldata description) public {
+    function registerRestaurant(string calldata name, string calldata description, string calldata physicalAddress) public {
         Restaurant storage restaurant = restaurants[msg.sender];
         restaurant.addr = msg.sender;
         restaurant.name = name;
         restaurant.description = description;
+        restaurant.physicalAddress = physicalAddress;
         restaurantsAddr.push(msg.sender);
     }
 

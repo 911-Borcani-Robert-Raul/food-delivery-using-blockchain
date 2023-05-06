@@ -1,46 +1,62 @@
-import { Button, makeStyles } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Flex,
+  Link as ChakraLink,
+  Spacer,
+} from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
-import { Link } from "react-router-dom";
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    padding: theme.spacing(4),
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: theme.spacing(1),
-  },
-}));
+import { Link as RouterLink } from "react-router-dom";
 
 export const Header = () => {
-  const classes = useStyles();
   const { account, activateBrowserWallet, deactivate } = useEthers();
-
   const isConnected = account !== undefined;
 
   return (
-    <div className={classes.container}>
-      <Link to={"/"}>Home</Link>
-      <Link to={"/shoppingCart"}>Shopping Cart</Link>
-      <Link to={"/orders"}>Orders</Link>
-      <Link to={"/restaurant/manage"}>Manage restaurant</Link>
-      <Link to={"/courier"}>Courier section</Link>
-      <div>
+    <Flex
+      as="nav"
+      padding={4}
+      bg="gray.100"
+      color="gray.700"
+      alignItems="center"
+    >
+      <Flex alignItems="center" justifyContent="space-between" gap={4}>
+        <ChakraLink as={RouterLink} to="/" fontWeight="semibold">
+          Home
+        </ChakraLink>
+        <ChakraLink as={RouterLink} to="/shoppingCart" fontWeight="semibold">
+          Shopping Cart
+        </ChakraLink>
+        <ChakraLink as={RouterLink} to="/orders" fontWeight="semibold">
+          Orders
+        </ChakraLink>
+        <ChakraLink
+          as={RouterLink}
+          to="/restaurant/manage"
+          fontWeight="semibold"
+        >
+          Manage restaurant
+        </ChakraLink>
+        <ChakraLink as={RouterLink} to="/courier" fontWeight="semibold">
+          Courier section
+        </ChakraLink>
+      </Flex>
+      <Spacer />
+      <Box>
         {isConnected ? (
-          <div>
-            <Button color="primary" variant="contained" onClick={deactivate}>
-              Disconnect
-            </Button>
-          </div>
+          <Button colorScheme="teal" variant="solid" onClick={deactivate}>
+            Disconnect
+          </Button>
         ) : (
           <Button
-            color="primary"
-            variant="contained"
+            colorScheme="teal"
+            variant="solid"
             onClick={activateBrowserWallet}
           >
             Connect
           </Button>
         )}
-      </div>
-    </div>
+      </Box>
+    </Flex>
   );
 };

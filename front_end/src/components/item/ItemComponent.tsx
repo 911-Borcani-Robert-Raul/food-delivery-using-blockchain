@@ -1,3 +1,4 @@
+import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
 import { addToCart } from "../../shopping-cart/ShoppingCart";
@@ -9,16 +10,23 @@ interface ItemComponentProps {
 
 export function ItemComponent({ restaurantAddress, item }: ItemComponentProps) {
   return (
-    <div>
-      <h2>
-        {item.id!.toString()}.{item.name}
-      </h2>
-      <p>{item.description}</p>
-      <p>Price: {item.price.toString()}</p>
+    <Box p="4" borderWidth="1px" borderRadius="md" boxShadow="md" my="4">
+      <Heading size="md" mb="2">
+        {item.id!.toString()}. {item.name}
+      </Heading>
+      <Text fontSize="sm" mb="2">
+        {item.description}
+      </Text>
+      <Text fontSize="lg" fontWeight="bold" mb="4">
+        Price: {item.price.toString()}
+      </Text>
 
-      <button onClick={() => addToCart(restaurantAddress, item, 1)}>
+      <Button
+        colorScheme="teal"
+        onClick={() => addToCart(restaurantAddress, item, 1)}
+      >
         Add to cart
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 }

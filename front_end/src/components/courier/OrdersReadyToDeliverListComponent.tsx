@@ -4,12 +4,11 @@ import { Order, OrderStatus } from "../../domain/Order";
 import {
   useChangeOrderStatus,
   useGetNumberOfOrdersForCourier,
-  useGetNumberOfOrdersWaitingForCourier,
   useGetOrdersForCourier,
-  useGetWaitingForCourierOrders,
 } from "../../hooks/OrderHooks";
 import { useGetContractAddress } from "../Main";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
+import { Box, Text } from "@chakra-ui/react";
 
 export const OrdersReadyToDeliverListComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
@@ -30,13 +29,16 @@ export const OrdersReadyToDeliverListComponent = React.memo(() => {
   );
 
   return (
-    <div>
+    <Box>
+      <Text fontSize="lg" mb="4">
+        Orders Ready to Deliver:
+      </Text>
       <OrdersListComponentForStatusChange
         contractAddress={contractAddress}
         ordersList={readyToDeliverOrders}
         newStatus={OrderStatus.DELIVERING}
         statusChangeActionName={"Deliver order"}
       />
-    </div>
+    </Box>
   );
 });

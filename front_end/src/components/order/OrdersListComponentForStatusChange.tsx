@@ -1,12 +1,16 @@
+import { useEffect, useState } from "react";
 import { getOrderStatusString, Order, OrderStatus } from "../../domain/Order";
 import { useChangeOrderStatus } from "../../hooks/OrderHooks";
 import { OrderLinkComponent } from "./OrderLinkComponent";
+import { SingleOrderStatusChangeComponent } from "./SingleOrderStatusChangeComponent";
+import { Box, Grid, Text } from "@chakra-ui/react";
 
 interface Props {
   contractAddress: string;
   ordersList: Order[];
   newStatus: OrderStatus;
   statusChangeActionName: string;
+  allowTimeDuration?: boolean;
 }
 
 export function OrdersListComponentForStatusChange({
@@ -14,37 +18,33 @@ export function OrdersListComponentForStatusChange({
   ordersList,
   newStatus,
   statusChangeActionName,
+  allowTimeDuration = false,
 }: Props) {
-  const { state, changeStatus } = useChangeOrderStatus(
-    contractAddress,
-    newStatus
-  );
-
-  async function onClick_modifyOrderStatus(orderId: number) {
-    await changeStatus(orderId);
-  }
-
   return (
-    <div>
-      <div>You have {ordersList.length} orders.</div>
-      <div>
+    <Box p={8}>
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        You have {ordersList.length} orders.
+      </Text>
+      <Grid
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+        }}
+        gap={4}
+      >
         {ordersList.map((order) => (
-          <div key={`Order:${order.orderId}`}>
-            <OrderLinkComponent order={order} />
-            {order!.items?.map((item) => (
-              <div key={`Item:${item}`}>{item.toString()}</div>
-            ))}
-            {order!.quantities?.map((quantity, index) => (
-              <div key={`Quantity:${index}`}>{quantity.toString()}</div>
-            ))}
-            <div>
-              <button onClick={() => onClick_modifyOrderStatus(order.orderId!)}>
-                {statusChangeActionName}
-              </button>
-            </div>
-          </div>
+          <Box key={`Order:${order.orderId}`} mb={4}>
+            <SingleOrderStatusChangeComponent
+              contractAddress={contractAddress}
+              newStatus={newStatus}
+              order={order}
+              statusChangeActionName={statusChangeActionName}
+              allowTimeDuration={allowTimeDuration}
+            />
+          </Box>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
 }

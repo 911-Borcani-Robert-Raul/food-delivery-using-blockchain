@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Box, Text, Link } from "@chakra-ui/react";
 import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
 import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
@@ -20,7 +20,10 @@ export function ItemsListComponent({
   const items = useGetItems(contractAddress, restaurantAddress, numberOfItems!);
 
   return (
-    <div>
+    <Box>
+      <Text fontSize="lg" mb="4">
+        Menu Items:
+      </Text>
       {items.map(
         (item) =>
           item.available && (
@@ -31,6 +34,9 @@ export function ItemsListComponent({
             />
           )
       )}
-    </div>
+      <Link href={`/`} mt="4">
+        Back to restaurants
+      </Link>
+    </Box>
   );
 }

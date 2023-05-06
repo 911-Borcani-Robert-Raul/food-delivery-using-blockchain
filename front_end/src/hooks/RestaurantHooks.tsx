@@ -1,4 +1,4 @@
-import { Falsy, useCall } from "@usedapp/core";
+import { Falsy, useCall, useContractFunction } from "@usedapp/core";
 import { Contract, utils } from "ethers";
 import { useEffect, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
@@ -156,8 +156,19 @@ async function getRestaurant(
   try {
     const value = await contract.callStatic.restaurants(address);
 
-    if (value !== undefined && value.addr && value.name && value.description) {
-      return new Restaurant(value.addr, value.name, value.description);
+    if (
+      value !== undefined &&
+      value.addr &&
+      value.name &&
+      value.description &&
+      value.physicalAddress
+    ) {
+      return new Restaurant(
+        value.addr,
+        value.name,
+        value.description,
+        value.physicalAddress
+      );
     } else {
       console.error(`Invalid response from contract: ${JSON.stringify(value)}`);
       return undefined;
@@ -166,4 +177,22 @@ async function getRestaurant(
     console.error(`Error calling contract: ${error.toString()}`);
     return undefined;
   }
+}
+
+export function useRegisterRestaurant(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "registerRestaurant", {
+    transactionName: "RegisterRestaurant",
+  });
+
+  const registerRestaurant = async (restaurant: Restaurant) => {
+    send(restaurant.name, restaurant.description, restaurant.physicalAddress);
+  };
+
+  return { state, registerRestaurant };
 }
