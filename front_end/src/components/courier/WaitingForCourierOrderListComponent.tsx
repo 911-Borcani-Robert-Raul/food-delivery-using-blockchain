@@ -27,7 +27,15 @@ export const WaitingForCourierOrderListComponent = React.memo(() => {
     useChangeOrderStatus(contractAddress, OrderStatus.ASSIGNED_COURIER);
 
   return (
-    <Box>
+    <Box
+      p={6}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      maxW="900px"
+      mx="auto"
+      mt={8}
+    >
       <OrdersListComponentForStatusChange
         contractAddress={contractAddress}
         ordersList={orders}

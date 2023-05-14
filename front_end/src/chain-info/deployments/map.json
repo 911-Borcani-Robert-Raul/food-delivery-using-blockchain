@@ -18,5 +18,13 @@
       "0x3E1693c068355F549A870bB3fA8753D228Dd36D6",
       "0xd65a7C1074843cE12758350F5A47f844295601d7"
     ]
+  },
+  "5777": {
+    "FoodDelivery": [
+      "0x56ceA4956f528008D705327141C963630D315E32"
+    ],
+    "MockV3Aggregator": [
+      "0xfBf4b7e5a252b1e9CFD5A585baB7a778eBB7f475"
+    ]
   }
 }

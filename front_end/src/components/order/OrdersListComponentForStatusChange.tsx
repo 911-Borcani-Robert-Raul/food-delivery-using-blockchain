@@ -26,11 +26,7 @@ export function OrdersListComponentForStatusChange({
         You have {ordersList.length} orders.
       </Text>
       <Grid
-        templateColumns={{
-          base: "repeat(1, 1fr)",
-          md: "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-        }}
+        templateColumns="repeat(1, 1fr)" // Display a single column in all screen sizes
         gap={4}
       >
         {ordersList.map((order) => (

@@ -1,5 +1,16 @@
 import React, { useState } from "react";
 import { Review } from "../../domain/Review";
+import {
+  FormControl,
+  FormLabel,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Textarea,
+  Button,
+  Box,
+} from "@chakra-ui/react";
 
 interface Props {
   onSubmit: (review: Review) => void;
@@ -17,26 +28,33 @@ export function CreateReviewComponent(props: Props) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Rating:
-        <input
-          type="number"
-          min="1"
-          max="5"
+      <FormControl>
+        <FormLabel>Rating:</FormLabel>
+        <Slider
+          min={1}
+          max={5}
+          step={1}
           value={rating}
-          onChange={(e) => setRating(Number(e.target.value))}
-        />
-      </label>
+          onChange={(value) => setRating(value)}
+        >
+          <SliderTrack bg="gray.200">
+            <SliderFilledTrack bg="teal.500" />
+          </SliderTrack>
+          <SliderThumb boxSize={6}>
+            <Box color="teal.500" />
+          </SliderThumb>
+        </Slider>
+      </FormControl>
       <br />
-      <label>
-        Comment:
-        <textarea
+      <FormControl>
+        <FormLabel>Comment:</FormLabel>
+        <Textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-      </label>
+      </FormControl>
       <br />
-      <button type="submit">Submit Review</button>
+      <Button type="submit">Submit Review</Button>
     </form>
   );
 }

@@ -29,7 +29,15 @@ export const OrdersReadyToDeliverListComponent = React.memo(() => {
   );
 
   return (
-    <Box>
+    <Box
+      p={6}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      maxW="900px"
+      mx="auto"
+      mt={8}
+    >
       <Text fontSize="lg" mb="4">
         Orders Ready to Deliver:
       </Text>

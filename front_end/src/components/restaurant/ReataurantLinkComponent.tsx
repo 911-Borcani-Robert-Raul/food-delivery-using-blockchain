@@ -1,6 +1,7 @@
 import { Box, Heading, Text, Link, Button } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { Restaurant } from "../../domain/Restaurant";
+import { clearShoppingCart } from "../../shopping-cart/ShoppingCart";
 
 interface Props {
   restaurant: Restaurant;
@@ -21,6 +22,7 @@ export function RestaurantLinkComponent({ restaurant }: Props) {
       <Button
         as={RouterLink}
         to={`restaurant/${restaurant.addr}`}
+        onClick={() => clearShoppingCart()}
         colorScheme="teal"
         size="sm"
       >

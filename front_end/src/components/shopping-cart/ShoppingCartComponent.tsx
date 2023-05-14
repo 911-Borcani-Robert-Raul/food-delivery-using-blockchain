@@ -85,7 +85,14 @@ export function ShoppingCartComponent() {
     }
   }, [state]);
   return (
-    <Box p={6} bg="white" boxShadow="sm" borderRadius="lg">
+    <Box
+      p={6}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      maxW="400px"
+      mx="auto"
+    >
       <Text fontSize="2xl" fontWeight="semibold" mb={4}>
         Shopping Cart
       </Text>

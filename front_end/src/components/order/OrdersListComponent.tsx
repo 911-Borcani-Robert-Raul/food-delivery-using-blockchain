@@ -18,9 +18,17 @@ const OrdersListComponent = React.memo(() => {
     (order) => order.orderStatus === OrderStatus.DELIVERING
   );
 
-  console.log("RestaurantComponent render");
   return (
-    <VStack mt={8} spacing={8}>
+    <VStack
+      p={6}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      maxW="900px"
+      mx="auto"
+      mt={8}
+      spacing={8}
+    >
       <Box w="100%">
         <Heading size="lg">Orders being delivered now</Heading>
         <Divider />
@@ -36,11 +44,14 @@ const OrdersListComponent = React.memo(() => {
       <Box w="100%">
         <Heading size="lg">All your orders</Heading>
         <Divider />
-        <Box>You have {numberOfOrders} orders.</Box>
         <Box mt={2}>
-          {orders.map((order) => (
-            <OrderLinkComponent key={order.orderId} order={order} />
-          ))}
+          <OrdersListComponentForStatusChange
+            contractAddress={contractAddress}
+            ordersList={orders}
+            newStatus={OrderStatus.CANCELLED}
+            statusChangeActionName={"Delete order"}
+            allowTimeDuration={false}
+          />
         </Box>
       </Box>
     </VStack>

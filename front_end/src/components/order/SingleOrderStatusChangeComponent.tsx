@@ -1,4 +1,4 @@
-import { Button, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, Input, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getOrderStatusString, Order, OrderStatus } from "../../domain/Order";
@@ -34,12 +34,15 @@ export function SingleOrderStatusChangeComponent({
 
   async function onClick_modifyOrderStatus(
     orderId: number,
-    durationSeconds: number | undefined
+    durationMinutes: number | undefined
   ) {
-    await changeStatus(orderId, durationSeconds);
+    await changeStatus(
+      orderId,
+      durationMinutes ? durationMinutes * 60 : undefined
+    );
   }
 
-  let durationSeconds: number | undefined = undefined;
+  let durationMinutes: number | undefined = undefined;
 
   useEffect(() => {
     if (state.status === "Success") {
@@ -63,31 +66,38 @@ export function SingleOrderStatusChangeComponent({
       borderRadius="md"
     >
       <OrderLinkComponent order={order} />
-      {order?.items?.map((item) => (
-        <div key={`Item:${item}`}>{item.toString()}</div>
-      ))}
-      {order?.quantities?.map((quantity, index) => (
-        <div key={`Quantity:${index}`}>{quantity.toString()}</div>
+      {order?.items?.map((item, index) => (
+        <div key={`OrderItem:${index}`}>
+          {order?.quantities![index].toString()} x {item.toString()}
+        </div>
       ))}
       {allowTimeDuration && (
         <Input
           type="number"
           id={`duration_${order.orderId}`}
           min="0"
-          placeholder="Seconds"
+          placeholder="Minutes"
           onChange={(event) => {
-            durationSeconds = parseInt(event.target.value, 10);
+            durationMinutes = parseInt(event.target.value, 10);
           }}
         />
       )}
-      <Button
-        onClick={() =>
-          onClick_modifyOrderStatus(order.orderId!, durationSeconds)
-        }
-      >
-        {statusChangeActionName}
-      </Button>
-      {progress && <p>{progress}</p>}
+      {!(
+        newStatus === OrderStatus.CANCELLED &&
+        (order.orderStatus === OrderStatus.CANCELLED ||
+          order.orderStatus === OrderStatus.DELIVERED)
+      ) && (
+        <Box>
+          <Button
+            onClick={() =>
+              onClick_modifyOrderStatus(order.orderId!, durationMinutes)
+            }
+          >
+            {statusChangeActionName}
+          </Button>
+          {progress && <p>{progress}</p>}{" "}
+        </Box>
+      )}
     </VStack>
   );
 }

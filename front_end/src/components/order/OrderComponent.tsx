@@ -52,18 +52,6 @@ export function OrderComponent(props: Props) {
               <CreateReviewComponent onSubmit={sendReview} />
             </Box>
           )}
-
-          {order.orderStatus === OrderStatus.DELIVERED && (
-            <Button
-              as="a"
-              href={`/order/${orderId}/review`}
-              variant="solid"
-              colorScheme="blue"
-              mt={2}
-            >
-              Edit Review
-            </Button>
-          )}
         </Box>
       )}
     </Box>

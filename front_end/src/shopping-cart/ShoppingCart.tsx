@@ -40,11 +40,11 @@ export function clearShoppingCart(): void {
 }
 
 // Add an item to the cart
-export function addToCart(
+export async function addToCart(
   restaurantAddress: string,
   item: Item,
   quantity: number
-): void {
+) {
   let cartState = getCartState();
   const { items, quantities } = cartState;
 

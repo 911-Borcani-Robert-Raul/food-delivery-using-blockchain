@@ -4,6 +4,7 @@ import {
   Flex,
   Link as ChakraLink,
   Spacer,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import { Link as RouterLink } from "react-router-dom";
@@ -12,6 +13,9 @@ export const Header = () => {
   const { account, activateBrowserWallet, deactivate } = useEthers();
   const isConnected = account !== undefined;
 
+  // Get the desired width based on the screen size
+  const headerWidth = useBreakpointValue({ base: "100%", md: "1000px" });
+
   return (
     <Flex
       as="nav"
@@ -19,6 +23,8 @@ export const Header = () => {
       bg="gray.100"
       color="gray.700"
       alignItems="center"
+      width={headerWidth}
+      mx="auto"
     >
       <Flex alignItems="center" justifyContent="space-between" gap={4}>
         <ChakraLink as={RouterLink} to="/" fontWeight="semibold">

@@ -468,6 +468,10 @@ export function useChangeOrderStatus(
       methodName = "orderDelivered";
       transactionName = "OrderDelivered";
       break;
+    case OrderStatus.CANCELLED:
+      methodName = "cancelOrder";
+      transactionName = "CancelOrder";
+      break;
   }
 
   if (toStatus === OrderStatus.WAITING_COURIER) {

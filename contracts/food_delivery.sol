@@ -362,6 +362,8 @@ contract FoodDelivery {
     function cancelOrder(uint256 orderId) public {
         Order storage order = orders[orderId];
         require(order.id == orderId, "Order with given id does not exist");
+        require(order.clientAddr == msg.sender, "Order must be cancelled by client");
+        require(order.status != OrderStatus.DELIVERED && order.status != OrderStatus.CANCELLED, "Order cannot be in DELIVERED or CANCELLED status already");
         
         // refund the client
         address payable clientAddr = payable(order.clientAddr);
