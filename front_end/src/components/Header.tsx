@@ -14,7 +14,7 @@ export const Header = () => {
   const isConnected = account !== undefined;
 
   // Get the desired width based on the screen size
-  const headerWidth = useBreakpointValue({ base: "100%", md: "1000px" });
+  const headerWidth = useBreakpointValue({ base: "100%", md: "900px" });
 
   return (
     <Flex

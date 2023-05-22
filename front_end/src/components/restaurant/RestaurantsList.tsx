@@ -14,10 +14,18 @@ export const RestaurantsList = React.memo(() => {
 
   console.log("RestaurantComponent render");
   return (
-    <Box>
+    <Box
+      p={6}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      maxW="900px"
+      mx="auto"
+      mt={8}
+    >
       <div>There are {numberOfRestaurants} restaurants.</div>
       <Center>
-        <Grid templateColumns="repeat(1, 1fr)" gap={6} maxW="500px">
+        <Grid templateColumns="repeat(1, 1fr)" gap={6}>
           {restaurants.map((restaurant) => (
             <GridItem key={restaurant.addr}>
               <RestaurantLinkComponent restaurant={restaurant} />

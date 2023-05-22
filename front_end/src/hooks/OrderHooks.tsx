@@ -1,4 +1,10 @@
-import { useCall, useContractFunction, useEthers } from "@usedapp/core";
+import {
+  useBlockMeta,
+  useBlockNumber,
+  useCall,
+  useContractFunction,
+  useEthers,
+} from "@usedapp/core";
 import { Contract, ethers, utils } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
@@ -151,150 +157,171 @@ export function useGetNumberOfOrdersWaitingForCourier(contractAddress: string) {
 
 export const useGetOrders = (
   contractAddress: string,
-  clientAddress: string,
-  numberOfOrders: number
+  clientAddress: string
 ) => {
-  const [restaurants, setRestaurants] = useState<Order[]>([]);
+  const [ordersList, setOrdersList] = useState<Order[]>([]);
+
+  const block = useBlockNumber();
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const restaurantArray = [];
-      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        const orderId = await getOrderId(contract, clientAddress, orderIndex);
-        const restaurant = await getOrder(contract, orderId);
-        if (restaurant) {
-          restaurantArray.push(restaurant);
-        }
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
+          contractAddress,
+          abi.abi,
+          alchemyGoerliProvider
+        );
+        const orders = await contract.callStatic.getAllOrdersForClient(
+          clientAddress
+        );
+        const formattedRestaurants = orders.map(
+          (order: any) =>
+            new Order(
+              order.id,
+              order!.restaurantAddr,
+              undefined,
+              order.quantities,
+              order.deliveryFee,
+              order.deliveryAddress,
+              order!.status
+            )
+        );
+        setOrdersList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setRestaurants(restaurantArray);
     };
 
-    if (contractAddress && numberOfOrders > 0) {
-      fetchRestaurants();
-    }
-  }, [contractAddress, clientAddress, numberOfOrders]);
+    fetchRestaurantList();
+  }, [contractAddress, clientAddress, block]);
 
-  return restaurants;
+  return ordersList;
 };
 
 export const useGetOrdersForRestaurant = (
   contractAddress: string,
-  restaurantAddress: string,
-  numberOfOrders: number
+  restaurantAddress: string
 ) => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersList, setOrdersList] = useState<Order[]>([]);
+
+  const block = useBlockNumber();
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const restaurantArray = [];
-      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        const orderId = await getRestaurantOrderId(
-          contract,
-          restaurantAddress,
-          orderIndex
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
+          contractAddress,
+          abi.abi,
+          alchemyGoerliProvider
         );
-        const restaurant = await getOrder(contract, orderId);
-        if (restaurant) {
-          restaurantArray.push(restaurant);
-        }
+        const orders = await contract.callStatic.getAllOrdersForRestaurant(
+          restaurantAddress
+        );
+        const formattedRestaurants = orders.map(
+          (order: any) =>
+            new Order(
+              order.id,
+              order!.restaurantAddr,
+              undefined,
+              order.quantities,
+              order.deliveryFee,
+              order.deliveryAddress,
+              order!.status
+            )
+        );
+        setOrdersList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setOrders(restaurantArray);
     };
 
-    if (contractAddress && numberOfOrders > 0) {
-      fetchRestaurants();
-    }
-  }, [contractAddress, restaurantAddress, numberOfOrders]);
+    fetchRestaurantList();
+  }, [contractAddress, restaurantAddress, block]);
 
-  return orders;
+  return ordersList;
 };
 
 export const useGetOrdersForCourier = (
   contractAddress: string,
-  courierAddress: string,
-  numberOfOrders: number
+  courierAddress: string
 ) => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersList, setOrdersList] = useState<Order[]>([]);
+
+  const block = useBlockNumber();
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const restaurantArray = [];
-      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        const orderId = await getCourierOrderId(
-          contract,
-          courierAddress,
-          orderIndex
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
+          contractAddress,
+          abi.abi,
+          alchemyGoerliProvider
         );
-        const restaurant = await getOrder(contract, orderId);
-        if (restaurant) {
-          restaurantArray.push(restaurant);
-        }
+        const orders = await contract.callStatic.getOrdersForCouriers(
+          courierAddress
+        );
+        const formattedRestaurants = orders.map(
+          (order: any) =>
+            new Order(
+              order.id,
+              order!.restaurantAddr,
+              undefined,
+              order.quantities,
+              order.deliveryFee,
+              order.deliveryAddress,
+              order!.status
+            )
+        );
+        setOrdersList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setOrders(restaurantArray);
     };
 
-    if (contractAddress && numberOfOrders > 0) {
-      fetchOrders();
-    }
-  }, [contractAddress, courierAddress, numberOfOrders]);
+    fetchRestaurantList();
+  }, [contractAddress, courierAddress, block]);
 
-  return orders;
+  return ordersList;
 };
 
-export const useGetWaitingForCourierOrders = (
-  contractAddress: string,
-  restaurantAddress: string,
-  numberOfOrders: number
-) => {
-  const [orders, setOrders] = useState<Order[]>([]);
+export const useGetWaitingForCourierOrders = (contractAddress: string) => {
+  const [ordersList, setOrdersList] = useState<Order[]>([]);
+
+  const block = useBlockNumber();
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const restaurantArray = [];
-      for (let orderIndex = 0; orderIndex < numberOfOrders; ++orderIndex) {
-        const orderId = await getWaitingForCourierOrderId(contract, orderIndex);
-        const restaurant = await getOrder(contract, orderId);
-        if (restaurant) {
-          restaurantArray.push(restaurant);
-        }
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
+          contractAddress,
+          abi.abi,
+          alchemyGoerliProvider
+        );
+        const orders = await contract.callStatic.getOrdersByStatus(
+          OrderStatus.WAITING_COURIER
+        );
+        const formattedRestaurants = orders.map(
+          (order: any) =>
+            new Order(
+              order.id,
+              order!.restaurantAddr,
+              undefined,
+              order.quantities,
+              order.deliveryFee,
+              order.deliveryAddress,
+              order!.status
+            )
+        );
+        setOrdersList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setOrders(restaurantArray);
     };
 
-    if (contractAddress && numberOfOrders > 0) {
-      fetchRestaurants();
-    }
-  }, [contractAddress, restaurantAddress, numberOfOrders]);
+    fetchRestaurantList();
+  }, [contractAddress, block]);
 
-  return orders;
+  return ordersList;
 };
 
 async function getOrderId(

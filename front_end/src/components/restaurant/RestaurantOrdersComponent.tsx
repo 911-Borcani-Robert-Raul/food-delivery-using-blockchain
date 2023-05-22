@@ -19,11 +19,7 @@ export const RestaurantOrdersComponent = React.memo(() => {
     contractAddress,
     account!
   );
-  const orders: Order[] = useGetOrdersForRestaurant(
-    contractAddress,
-    account!,
-    numberOfOrders!
-  );
+  const orders: Order[] = useGetOrdersForRestaurant(contractAddress, account!);
 
   const pendingOrders: Order[] = orders.filter(
     (order) => order.orderStatus === OrderStatus.PENDING

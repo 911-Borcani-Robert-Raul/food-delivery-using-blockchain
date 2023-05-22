@@ -30,6 +30,13 @@ export function OrderComponent(props: Props) {
             {order.restaurantAddr}
           </Text>
           <Text>{order.deliveryAddress}</Text>
+
+          {order?.items?.map((item, index) => (
+            <div key={`OrderItem:${index}`}>
+              {order?.quantities![index].toString()} x {item.toString()}
+            </div>
+          ))}
+
           <Text>Order status: {getOrderStatusString(order.orderStatus)}</Text>
 
           {review && (

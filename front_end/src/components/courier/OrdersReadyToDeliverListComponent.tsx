@@ -18,11 +18,7 @@ export const OrdersReadyToDeliverListComponent = React.memo(() => {
     contractAddress,
     account!
   );
-  const orders: Order[] = useGetOrdersForCourier(
-    contractAddress,
-    account!,
-    numberOfOrders!
-  );
+  const orders: Order[] = useGetOrdersForCourier(contractAddress, account!);
 
   const readyToDeliverOrders: Order[] = orders.filter(
     (order) => order.orderStatus === OrderStatus.READY_TO_DELIVER

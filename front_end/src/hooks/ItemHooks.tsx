@@ -1,4 +1,9 @@
-import { Falsy, useCall, useContractFunction } from "@usedapp/core";
+import {
+  Falsy,
+  useBlockNumber,
+  useCall,
+  useContractFunction,
+} from "@usedapp/core";
 import { Contract, utils } from "ethers";
 import { useEffect, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
@@ -59,34 +64,41 @@ export function useGetItemByIndex(
 
 export function useGetItems(
   contractAddress: string,
-  restaurantAddress: string,
-  numberOfItems: number
+  restaurantAddress: string
 ) {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, itemsList] = useState<Item[]>([]);
+
+  const block = useBlockNumber();
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const itemsArray = [];
-      for (let itemIndex = 0; itemIndex < numberOfItems; ++itemIndex) {
-        const item = await getItem(contract, restaurantAddress, itemIndex);
-        if (item) {
-          itemsArray.push(item);
-        }
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
+          contractAddress,
+          abi.abi,
+          alchemyGoerliProvider
+        );
+        const items = await contract.callStatic.getItemsForRestaurant(
+          restaurantAddress
+        );
+        const formattedRestaurants = items.map(
+          (item: any) =>
+            new Item(
+              item.id,
+              item.name,
+              item.description,
+              item.price,
+              item.available
+            )
+        );
+        itemsList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setItems(itemsArray);
     };
 
-    if (contractAddress && numberOfItems > 0) {
-      fetchRestaurants();
-    }
-  }, [contractAddress, restaurantAddress, numberOfItems]);
+    fetchRestaurantList();
+  }, [contractAddress, restaurantAddress, block]);
 
   return items;
 }

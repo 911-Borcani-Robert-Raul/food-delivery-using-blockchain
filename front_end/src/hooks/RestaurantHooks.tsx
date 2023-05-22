@@ -92,46 +92,36 @@ export const useGetRestaurants = (
   contractAddress: string,
   numberOfRestaurants: number
 ) => {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [restaurantList, setRestaurantList] = useState<Restaurant[]>([]);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      const contractInterface = new utils.Interface(abi.abi);
-      const contract = new Contract(
-        contractAddress,
-        contractInterface,
-        alchemyGoerliProvider
-      );
-
-      const restaurantArray = [];
-      for (
-        let restaurantIndex = 0;
-        restaurantIndex < numberOfRestaurants;
-        ++restaurantIndex
-      ) {
-        const restaurantAddr = await getRestaurantAddress(
-          contract,
+    const fetchRestaurantList = async () => {
+      try {
+        const contract: Contract = new Contract(
           contractAddress,
-          restaurantIndex
+          abi.abi,
+          alchemyGoerliProvider
         );
-        const restaurant = await getRestaurant(
-          contract,
-          contractAddress,
-          restaurantAddr
+        const restaurants = await contract.callStatic.getAllRestaurants();
+        const formattedRestaurants = restaurants[0].map(
+          (restaurant: any) =>
+            new Restaurant(
+              restaurant.addr,
+              restaurant.name,
+              restaurant.description,
+              restaurant.physicalAddress
+            )
         );
-        if (restaurant) {
-          restaurantArray.push(restaurant);
-        }
+        setRestaurantList(formattedRestaurants);
+      } catch (error) {
+        console.error("Error fetching restaurant list:", error);
       }
-      setRestaurants(restaurantArray);
     };
 
-    if (contractAddress && numberOfRestaurants > 0) {
-      fetchRestaurants();
-    }
+    fetchRestaurantList();
   }, [contractAddress, numberOfRestaurants]);
 
-  return restaurants;
+  return restaurantList;
 };
 
 async function getRestaurantAddress(

@@ -18,11 +18,7 @@ export const WaitingForCourierOrderListComponent = React.memo(() => {
   const { account } = useEthers();
 
   const numberOfOrders = useGetNumberOfOrdersWaitingForCourier(contractAddress);
-  const orders = useGetWaitingForCourierOrders(
-    contractAddress,
-    account!,
-    numberOfOrders!
-  );
+  const orders = useGetWaitingForCourierOrders(contractAddress);
   const { state: takeOrderState, changeStatus: takeOrderSend } =
     useChangeOrderStatus(contractAddress, OrderStatus.ASSIGNED_COURIER);
 

@@ -18,7 +18,6 @@ export function OrderLinkComponent({ order }: Props) {
     >
       <Text mb={1}>{order.restaurantAddr}</Text>
       <Text mb={1}>Address: {order.deliveryAddress}</Text>
-      <Text mb={1}>Delivery fee: {order.deliveryFee.toString()}</Text>
       <Text fontWeight="bold" mb={1}>
         Order status: {getOrderStatusString(order.orderStatus)}
       </Text>

@@ -77,6 +77,67 @@ contract FoodDelivery {
         ethUsdPriceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
+    function getAllRestaurants() public view returns (Restaurant[] memory, uint256[] memory) {
+        Restaurant[] memory allRestaurants = new Restaurant[](restaurantsAddr.length);
+        uint256[] memory reviewsForRestaurants = new uint256[](restaurantsAddr.length);
+
+        for (uint256 i = 0; i < restaurantsAddr.length; i++) {
+            address restaurantAddress = restaurantsAddr[i];
+            Restaurant storage restaurant = restaurants[restaurantAddress];
+            allRestaurants[i] = restaurant;
+
+            reviewsForRestaurants[i] = getAverageRatingForRestaurant(restaurantAddress);
+        }
+
+        return (allRestaurants, reviewsForRestaurants);
+    }
+
+    function getAllOrdersForClient(address clientAddr) public view returns (Order[] memory) {
+        uint256[] memory clientOrderIds = clientsToOrdersMapping[clientAddr];
+        Order[] memory clientOrders = new Order[](clientOrderIds.length);
+
+        for (uint256 i = 0; i < clientOrderIds.length; i++) {
+            uint256 orderId = clientOrderIds[i];
+            clientOrders[i] = orders[orderId];
+        }
+
+        return clientOrders;
+    }
+
+    function getAllOrdersForRestaurant(address restaurantAddr) public view returns (Order[] memory) {
+        uint256[] memory restaurantOrderIds = restaurantToOrdersIds[restaurantAddr];
+        Order[] memory restaurantOrders = new Order[](restaurantOrderIds.length);
+
+        for (uint256 i = 0; i < restaurantOrderIds.length; i++) {
+            uint256 orderId = restaurantOrderIds[i];
+            restaurantOrders[i] = orders[orderId];
+        }
+
+        return restaurantOrders;
+    }
+
+    function getOrdersForCouriers(address courierAddr) public view returns (Order[] memory) {
+        uint256[] memory courierOrderIds = couriersToOrdersMapping[courierAddr];
+        Order[] memory courierOrders = new Order[](courierOrderIds.length);
+
+        for (uint256 i = 0; i < courierOrderIds.length; i++) {
+            uint256 orderId = courierOrderIds[i];
+            courierOrders[i] = orders[orderId];
+        }
+
+        return courierOrders;
+    }
+
+    function getItemsForRestaurant(address restaurantAddr) public view returns (Item[] memory) {
+        Item[] memory items = new Item[](restaurants[restaurantAddr].items.length);
+
+        for (uint256 i = 0; i < items.length; ++i) {
+            items[i] = restaurants[restaurantAddr].items[i];
+        }
+
+        return items;
+    }
+
     function getNumberOfItemsInMenu(address restaurant) public view returns(uint) {
         return restaurants[restaurant].items.length;
     }

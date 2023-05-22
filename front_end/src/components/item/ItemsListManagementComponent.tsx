@@ -20,7 +20,7 @@ export function ItemsListManagementComponent({
     contractAddress,
     restaurantAddress
   );
-  const items = useGetItems(contractAddress, restaurantAddress, numberOfItems!);
+  const items = useGetItems(contractAddress, restaurantAddress);
 
   return (
     <Box>

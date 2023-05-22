@@ -3,10 +3,12 @@ import { Review } from "../domain/Review";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { Contract, utils } from "ethers";
 import { alchemyGoerliProvider } from "../App";
-import { useContractFunction } from "@usedapp/core";
+import { useBlockNumber, useContractFunction } from "@usedapp/core";
 
 export function useGetOrderReview(contractAddress: string, orderId: number) {
   const [review, setReview] = useState<Review>();
+
+  const block = useBlockNumber();
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -24,7 +26,7 @@ export function useGetOrderReview(contractAddress: string, orderId: number) {
     if (contractAddress) {
       fetchReview();
     }
-  }, [contractAddress, orderId]);
+  }, [contractAddress, orderId, block]);
 
   return review;
 }

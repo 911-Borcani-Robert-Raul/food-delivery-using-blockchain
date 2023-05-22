@@ -1,9 +1,15 @@
+import json
+import os
+import shutil
 from decimal import HAVE_THREADS
-from scripts.helpful_scripts import LOCAL_BLOCKCHAIN_ENVIRONEMENTS, get_account, deploy_mocks
-from brownie import MockV3Aggregator, FoodDelivery, config, network
+
+import yaml
 from web3 import Web3
-import yaml, json
-import os, shutil
+
+from brownie import FoodDelivery, MockV3Aggregator, config, network
+from scripts.helpful_scripts import (LOCAL_BLOCKCHAIN_ENVIRONEMENTS,
+                                     deploy_mocks, get_account)
+
 
 def deploy_app(front_end_update=False):
     account = get_account()
@@ -41,4 +47,4 @@ def copy_folders_to_front_end(src, dest):
 
 
 def main():
-    deploy_app(front_end_update=True)
+    deploy_app(front_end_update=False)

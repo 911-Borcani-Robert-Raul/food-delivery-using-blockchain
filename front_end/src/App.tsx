@@ -98,11 +98,7 @@ function App() {
             [Goerli.chainId]: alchemyGoerliProvider,
             5777: getDefaultProvider("http://localhost:7545"),
           },
-          notifications: {
-            expirationPeriod: 1000,
-            checkInterval: 1000,
-          },
-          refresh: 10,
+          refresh: "everyBlock",
         }}
       >
         <RouterProvider router={router} />

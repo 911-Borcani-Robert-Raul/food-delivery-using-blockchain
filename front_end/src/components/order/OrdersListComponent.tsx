@@ -12,7 +12,7 @@ const OrdersListComponent = React.memo(() => {
   const { account } = useEthers();
 
   const numberOfOrders = useGetNumberOfOrders(contractAddress, account!);
-  const orders = useGetOrders(contractAddress, account!, numberOfOrders!);
+  const orders = useGetOrders(contractAddress, account!);
 
   const deliveringOrders = orders.filter(
     (order) => order.orderStatus === OrderStatus.DELIVERING
@@ -37,7 +37,7 @@ const OrdersListComponent = React.memo(() => {
           ordersList={deliveringOrders}
           newStatus={OrderStatus.DELIVERED}
           statusChangeActionName={"Confirm order delivery"}
-          allowTimeDuration={true}
+          allowTimeDuration={false}
         />
       </Box>
 
