@@ -187,11 +187,10 @@ def test_increase_delivery_fee():
     contract.acceptOrder(order_id, max_preparation_time, {'from': restaurant_account})
 
     # Retrieve the order
-    order_id = contract.getNumberOfOrderForRestaurant(restaurant_account) - 1
     order = contract.orders(order_id)
 
     # Increase the delivery fee
-    additional_fee = 3 * 10 ** 16
+    additional_fee = contract.getPriceInEth(3)
     contract.increaseDeliveryFee(order_id, {'from': client_account, 'value': additional_fee})
 
     # Retrieve the updated order

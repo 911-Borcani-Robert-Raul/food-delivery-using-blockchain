@@ -1,4 +1,5 @@
 import { Box, Text, Link } from "@chakra-ui/react";
+import { useEthers } from "@usedapp/core";
 import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
 import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
@@ -17,6 +18,7 @@ export function ItemsListComponent({
     contractAddress,
     restaurantAddress
   );
+  const { account: clientAddress } = useEthers();
   const items = useGetItems(contractAddress, restaurantAddress);
 
   return (
@@ -31,6 +33,7 @@ export function ItemsListComponent({
               key={item.id}
               item={item}
               restaurantAddress={restaurantAddress}
+              clientAddress={clientAddress!}
             />
           )
       )}

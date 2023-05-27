@@ -5,6 +5,7 @@ export interface CartState {
   restaurantAddr: string;
   items: Item[];
   quantities: { [itemId: number]: number };
+  clientAddress: string;
 }
 
 // Get the cart state from local storage
@@ -15,7 +16,12 @@ export function getCartState(): CartState {
     const result: CartState = JSON.parse(storedState);
     return result;
   } else {
-    return { restaurantAddr: constants.AddressZero, items: [], quantities: {} };
+    return {
+      restaurantAddr: constants.AddressZero,
+      clientAddress: constants.AddressZero,
+      items: [],
+      quantities: {},
+    };
   }
 }
 
@@ -35,12 +41,14 @@ export function clearShoppingCart(): void {
     restaurantAddr: constants.AddressZero,
     items: [],
     quantities: {},
+    clientAddress: constants.AddressZero,
   };
   saveCartState(cartState);
 }
 
 // Add an item to the cart
 export async function addToCart(
+  clientAddress: string,
   restaurantAddress: string,
   item: Item,
   quantity: number
@@ -49,10 +57,14 @@ export async function addToCart(
   const { items, quantities } = cartState;
 
   // Check if the restaurant was changed
-  if (cartState.restaurantAddr !== restaurantAddress) {
+  if (
+    cartState.restaurantAddr !== restaurantAddress ||
+    cartState.clientAddress !== clientAddress
+  ) {
     clearShoppingCart();
     cartState = getCartState();
     cartState.restaurantAddr = restaurantAddress;
+    cartState.clientAddress = clientAddress;
   }
 
   // Check if the item is already in the cart

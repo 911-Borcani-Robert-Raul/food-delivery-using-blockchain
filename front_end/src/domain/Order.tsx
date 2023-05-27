@@ -33,6 +33,7 @@ export function getOrderStatusString(status: OrderStatus): string {
 
 export class Order {
   orderId: number | undefined;
+  clinetAddr: string;
   restaurantAddr: string;
   itemIds: number[] | undefined;
   quantities: number[] | undefined;
@@ -44,6 +45,7 @@ export class Order {
   constructor(
     orderId: number | undefined,
     restaurantAddr: string,
+    clientAddr: string,
     itemIds: number[] | undefined,
     quantities: number[] | undefined,
     deliveryFee: number,
@@ -52,6 +54,7 @@ export class Order {
   ) {
     this.orderId = orderId;
     this.restaurantAddr = restaurantAddr;
+    this.clinetAddr = clientAddr;
     this.itemIds = itemIds;
     this.quantities = quantities;
     this.deliveryFee = deliveryFee;

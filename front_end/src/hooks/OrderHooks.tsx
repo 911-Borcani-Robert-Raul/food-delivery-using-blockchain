@@ -17,6 +17,8 @@ export function useGetOrder(
 ): Order | null {
   const [order, setOrder] = useState<Order | null>(null);
 
+  const block = useBlockNumber();
+
   useEffect(() => {
     const fetchOrderData = async (): Promise<void> => {
       const contractInterface = new utils.Interface(abi.abi);
@@ -34,7 +36,7 @@ export function useGetOrder(
     };
 
     fetchOrderData();
-  }, [contractAddress, orderId]);
+  }, [contractAddress, orderId, block]);
 
   return order;
 }
@@ -179,6 +181,7 @@ export const useGetOrders = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
@@ -222,6 +225,7 @@ export const useGetOrdersForRestaurant = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
@@ -265,6 +269,7 @@ export const useGetOrdersForCourier = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
@@ -305,6 +310,7 @@ export const useGetWaitingForCourierOrders = (contractAddress: string) => {
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
@@ -398,6 +404,7 @@ async function getOrder(contract: Contract, orderId: number) {
       const result = new Order(
         orderId,
         order!.restaurantAddr,
+        order!.clientAddr,
         undefined,
         quantities,
         order.deliveryFee,
@@ -459,6 +466,28 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
   };
 
   return { state, placeOrder };
+}
+
+export function useIncreaseDeliveryFee(contractAddress: string) {
+  const contract = new Contract(
+    contractAddress,
+    abi.abi,
+    alchemyGoerliProvider
+  );
+
+  const { state, send } = useContractFunction(contract, "increaseDeliveryFee", {
+    transactionName: "IncreaseDeliveryFee",
+  });
+
+  const increaseFee = async (orderId: number, fee: number) => {
+    const cost = await contract.getPriceInEth(fee);
+
+    send(orderId, {
+      value: cost,
+    });
+  };
+
+  return { state, increaseFee };
 }
 
 export function useChangeOrderStatus(

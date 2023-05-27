@@ -348,7 +348,7 @@ contract FoodDelivery {
         require(order.status == OrderStatus.WAITING_COURIER);
         require(order.clientAddr == msg.sender, "Order delivery fee must be increased by the client");
 
-        order.deliveryFee += msg.value;
+        order.deliveryFee = order.deliveryFee + msg.value;
     }
 
     function takeOrder(uint256 orderId, uint256 maxDeliveryTime) public {

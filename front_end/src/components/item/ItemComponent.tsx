@@ -5,10 +5,15 @@ import { addToCart } from "../../shopping-cart/ShoppingCart";
 
 interface ItemComponentProps {
   restaurantAddress: string;
+  clientAddress: string;
   item: Item;
 }
 
-export function ItemComponent({ restaurantAddress, item }: ItemComponentProps) {
+export function ItemComponent({
+  restaurantAddress,
+  clientAddress,
+  item,
+}: ItemComponentProps) {
   return (
     <Box p="4" borderWidth="1px" borderRadius="md" boxShadow="md" my="4">
       <Heading size="md" mb="2">
@@ -23,7 +28,7 @@ export function ItemComponent({ restaurantAddress, item }: ItemComponentProps) {
 
       <Button
         colorScheme="teal"
-        onClick={() => addToCart(restaurantAddress, item, 1)}
+        onClick={() => addToCart(restaurantAddress, clientAddress, item, 1)}
       >
         Add to cart
       </Button>

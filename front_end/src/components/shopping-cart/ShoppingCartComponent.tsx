@@ -21,6 +21,7 @@ import {
 export function ShoppingCartComponent() {
   const [cartState, setCartState] = useState<CartState>({
     restaurantAddr: constants.AddressZero,
+    clientAddress: constants.AddressZero,
     items: [],
     quantities: {},
   });
@@ -44,6 +45,7 @@ export function ShoppingCartComponent() {
     new Order(
       undefined,
       cartState.restaurantAddr,
+      cartState.clientAddress,
       cartState.items.map((item) => item.id!),
       Object.values(cartState.quantities),
       deliveryFee,
@@ -63,6 +65,7 @@ export function ShoppingCartComponent() {
     const order: Order = new Order(
       undefined,
       cartState.restaurantAddr,
+      cartState.clientAddress,
       itemIds,
       itemQuantities,
       deliveryFee,
