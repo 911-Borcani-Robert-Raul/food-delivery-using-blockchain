@@ -54,7 +54,6 @@ export async function addToCart(
   quantity: number
 ) {
   let cartState = getCartState();
-  const { items, quantities } = cartState;
 
   // Check if the restaurant was changed
   if (
@@ -66,6 +65,8 @@ export async function addToCart(
     cartState.restaurantAddr = restaurantAddress;
     cartState.clientAddress = clientAddress;
   }
+
+  const { items, quantities } = cartState;
 
   // Check if the item is already in the cart
   const index = items.findIndex((i) => i.id === item.id);
