@@ -35,6 +35,8 @@ export class Order {
   orderId: number | undefined;
   clinetAddr: string;
   restaurantAddr: string;
+  restaurantName: string;
+  restaurantPhysicalAddress: string;
   itemIds: number[] | undefined;
   quantities: number[] | undefined;
   deliveryFee: number;
@@ -45,6 +47,8 @@ export class Order {
   constructor(
     orderId: number | undefined,
     restaurantAddr: string,
+    restaurantName: string,
+    restaurantPhysicalAddress: string,
     clientAddr: string,
     itemIds: number[] | undefined,
     quantities: number[] | undefined,
@@ -54,6 +58,8 @@ export class Order {
   ) {
     this.orderId = orderId;
     this.restaurantAddr = restaurantAddr;
+    this.restaurantName = restaurantName;
+    this.restaurantPhysicalAddress = restaurantPhysicalAddress;
     this.clinetAddr = clientAddr;
     this.itemIds = itemIds;
     this.quantities = quantities;

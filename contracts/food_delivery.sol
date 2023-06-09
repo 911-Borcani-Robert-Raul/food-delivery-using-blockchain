@@ -39,6 +39,8 @@ contract FoodDelivery {
     struct Order {
         uint256 id;
         address restaurantAddr;
+        string restaurantName;
+        string restaurantPhysicalAddress;
         address clientAddr;
         address courierAddr;
         uint256[] itemIndices;
@@ -51,7 +53,6 @@ contract FoodDelivery {
         uint256 maxDeliveryTime;        // in seconds
         uint256 preparationStartTime;   // timestamp
         uint256 deliveryStartTime;      // timestamp
-        uint256 refundAmount;           // amount to refund if thresholds exceeded
     }
 
     struct Review {
@@ -294,11 +295,11 @@ contract FoodDelivery {
         (uint256 totalPrice, uint256 ethDeliveryFee) = getWeiPriceForOrder(restaurantAddr, itemIds, quantities, deliveryFee);
         require(msg.value >= totalPrice + ethDeliveryFee, "Incorrect amount paid");
 
-        uint256 id = orders.length;
-
-        orders.push(Order({
-            id: id,
+        Order memory order = Order({
+            id: orders.length,
             restaurantAddr: restaurantAddr,
+            restaurantName: restaurant.name,
+            restaurantPhysicalAddress: restaurant.physicalAddress,
             clientAddr: msg.sender,
             courierAddr: address(0),
             itemIndices: itemIds,
@@ -310,11 +311,12 @@ contract FoodDelivery {
             maxPreparationTime: 0,
             maxDeliveryTime: 0,
             preparationStartTime: 0,
-            deliveryStartTime: 0,
-            refundAmount: 0
-        }));
-        clientsToOrdersMapping[msg.sender].push(id);
-        restaurantToOrdersIds[restaurantAddr].push(id);
+            deliveryStartTime: 0
+        });
+
+        orders.push(order);
+        clientsToOrdersMapping[msg.sender].push(order.id);
+        restaurantToOrdersIds[restaurantAddr].push(order.id);
     }
 
     function acceptOrder(uint256 orderId, uint256 maxPreparationTime) public {
@@ -474,7 +476,7 @@ contract FoodDelivery {
         }
 
         if (numberOfRatings == 0) {
-            return 0;
+            return 5;
         } else {
             return totalRating / numberOfRatings;
         }

@@ -13,7 +13,7 @@ import { ShoppingCartComponent } from "./components/shopping-cart/ShoppingCartCo
 import { ChakraProvider } from "@chakra-ui/react";
 import OrdersListComponent from "./components/order/OrdersListComponent";
 
-const alchemyApiKey = "IkArG5DA0XETBZgRCCspcYfoRJndJtJn";
+const alchemyApiKey = "";
 const alchemyUrl = `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`;
 
 export const alchemyGoerliProvider = new AlchemyProvider(

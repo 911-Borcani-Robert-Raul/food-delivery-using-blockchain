@@ -16,7 +16,7 @@ export function OrderLinkComponent({ order }: Props) {
       boxShadow="0 0 10px rgba(0, 0, 0, 0.2)"
       width="100%" // Take up all available horizontal space
     >
-      <Text mb={1}>{order.restaurantAddr}</Text>
+      <Text mb={1}>{order.restaurantName}</Text>
       <Text mb={1}>Address: {order.deliveryAddress}</Text>
       <Text fontWeight="bold" mb={1}>
         Order status: {getOrderStatusString(order.orderStatus)}

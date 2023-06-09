@@ -31,7 +31,8 @@ export function RegisterRestaurantComponent({
       undefined,
       name,
       description,
-      physicalAddress
+      physicalAddress,
+      undefined
     );
 
     await registerRestaurant(newRestaurant);

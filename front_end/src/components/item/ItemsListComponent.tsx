@@ -1,4 +1,4 @@
-import { Box, Text, Link } from "@chakra-ui/react";
+import { Box, Text, Link, Spinner } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
@@ -7,19 +7,16 @@ import { ItemComponent } from "./ItemComponent";
 
 interface ItemsListComponentProps {
   contractAddress: string;
-  restaurantAddress: string;
+  restaurant: Restaurant;
 }
 
 export function ItemsListComponent({
   contractAddress,
-  restaurantAddress,
+  restaurant,
 }: ItemsListComponentProps) {
-  const numberOfItems = useGetNumberOfItemsInMenu(
-    contractAddress,
-    restaurantAddress
-  );
   const { account: clientAddress } = useEthers();
-  const items = useGetItems(contractAddress, restaurantAddress);
+
+  const items = useGetItems(contractAddress, restaurant!.addr!);
 
   return (
     <Box>
@@ -32,7 +29,9 @@ export function ItemsListComponent({
             <ItemComponent
               key={item.id}
               item={item}
-              restaurantAddress={restaurantAddress}
+              restaurantAddress={restaurant.addr!}
+              restaurantName={restaurant.name}
+              restaurantPhysicalAddress={restaurant.physicalAddress}
               clientAddress={clientAddress!}
             />
           )

@@ -3,6 +3,8 @@ import { Item } from "../domain/Item";
 
 export interface CartState {
   restaurantAddr: string;
+  restaurantName: string;
+  restaurantPhysicalAddress: string;
   items: Item[];
   quantities: { [itemId: number]: number };
   clientAddress: string;
@@ -14,10 +16,13 @@ export function getCartState(): CartState {
 
   if (storedState) {
     const result: CartState = JSON.parse(storedState);
+    console.log(result);
     return result;
   } else {
     return {
       restaurantAddr: constants.AddressZero,
+      restaurantName: "",
+      restaurantPhysicalAddress: "",
       clientAddress: constants.AddressZero,
       items: [],
       quantities: {},
@@ -39,6 +44,8 @@ export function setRestaurantAddress(restaurantAddress: string): void {
 export function clearShoppingCart(): void {
   const cartState = {
     restaurantAddr: constants.AddressZero,
+    restaurantName: "",
+    restaurantPhysicalAddress: "",
     items: [],
     quantities: {},
     clientAddress: constants.AddressZero,
@@ -50,6 +57,8 @@ export function clearShoppingCart(): void {
 export async function addToCart(
   clientAddress: string,
   restaurantAddress: string,
+  restaurantName: string,
+  restaurantPhysicalAddress: string,
   item: Item,
   quantity: number
 ) {
@@ -63,6 +72,8 @@ export async function addToCart(
     clearShoppingCart();
     cartState = getCartState();
     cartState.restaurantAddr = restaurantAddress;
+    cartState.restaurantName = restaurantName;
+    cartState.restaurantPhysicalAddress = restaurantPhysicalAddress;
     cartState.clientAddress = clientAddress;
   }
 

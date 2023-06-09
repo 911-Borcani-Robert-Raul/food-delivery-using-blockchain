@@ -1,4 +1,4 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { useGetRestaurant } from "../../hooks/RestaurantHooks";
@@ -13,6 +13,19 @@ export function RestaurantComponent() {
     contractAddr,
     restaurantAddr!
   );
+
+  if (restaurant === undefined) {
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="200px"
+      >
+        <Spinner size="xl" color="blue.500" />
+      </Box>
+    );
+  }
 
   return (
     <Box py={8} px={4} maxW="2xl" mx="auto">
@@ -30,7 +43,7 @@ export function RestaurantComponent() {
         </Box>
         <ItemsListComponent
           contractAddress={contractAddr}
-          restaurantAddress={restaurantAddr!}
+          restaurant={restaurant}
         />
       </VStack>
     </Box>

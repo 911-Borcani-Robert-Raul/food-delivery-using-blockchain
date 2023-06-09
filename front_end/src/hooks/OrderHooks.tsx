@@ -181,6 +181,8 @@ export const useGetOrders = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.restaurantName,
+              order!.restaurantPhysicalAddress,
               order!.clientAddr,
               undefined,
               order.quantities,
@@ -225,6 +227,8 @@ export const useGetOrdersForRestaurant = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.restaurantName,
+              order!.restaurantPhysicalAddress,
               order!.clientAddr,
               undefined,
               order.quantities,
@@ -269,6 +273,8 @@ export const useGetOrdersForCourier = (
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.restaurantName,
+              order!.restaurantPhysicalAddress,
               order!.clientAddr,
               undefined,
               order.quantities,
@@ -310,6 +316,8 @@ export const useGetWaitingForCourierOrders = (contractAddress: string) => {
             new Order(
               order.id,
               order!.restaurantAddr,
+              order!.restaurantName,
+              order!.restaurantPhysicalAddress,
               order!.clientAddr,
               undefined,
               order.quantities,
@@ -404,6 +412,8 @@ async function getOrder(contract: Contract, orderId: number) {
       const result = new Order(
         orderId,
         order!.restaurantAddr,
+        order!.restaurantName,
+        order!.restaurantPhysicalAddress,
         order!.clientAddr,
         undefined,
         quantities,
@@ -441,6 +451,12 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
     // console.log(order.itemIds);
     // console.log(order.quantities);
     // console.log(order.deliveryFee);
+    console.log(
+      order.restaurantAddr,
+      order.itemIds,
+      order.quantities,
+      order.deliveryFee
+    );
     const { 0: totalPrice, 1: ethDeliveryFee } =
       await contract.getWeiPriceForOrder(
         order.restaurantAddr,
@@ -448,6 +464,8 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
         order.quantities,
         order.deliveryFee
       );
+
+    console.log("32423");
 
     const valueToSend = totalPrice.add(ethDeliveryFee);
     const valueToSendString = valueToSend.toString(); // convert to string

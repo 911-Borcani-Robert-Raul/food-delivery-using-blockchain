@@ -104,12 +104,13 @@ export const useGetRestaurants = (
         );
         const restaurants = await contract.callStatic.getAllRestaurants();
         const formattedRestaurants = restaurants[0].map(
-          (restaurant: any) =>
+          (restaurant: any, index: number) =>
             new Restaurant(
               restaurant.addr,
               restaurant.name,
               restaurant.description,
-              restaurant.physicalAddress
+              restaurant.physicalAddress,
+              restaurants[1][index].toNumber()
             )
         );
         setRestaurantList(formattedRestaurants);
@@ -157,7 +158,8 @@ async function getRestaurant(
         value.addr,
         value.name,
         value.description,
-        value.physicalAddress
+        value.physicalAddress,
+        undefined
       );
     } else {
       console.error(`Invalid response from contract: ${JSON.stringify(value)}`);

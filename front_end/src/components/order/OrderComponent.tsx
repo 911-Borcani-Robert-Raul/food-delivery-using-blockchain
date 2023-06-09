@@ -69,8 +69,10 @@ export function OrderComponent(_: Props) {
       {order && (
         <Box>
           <Text fontSize="xl" fontWeight="bold">
-            {order.restaurantAddr}
+            {order.restaurantName}
           </Text>
+          <Text>{order.restaurantPhysicalAddress}</Text>
+          <Text fontSize="sm">{order.restaurantAddr}</Text>
           <Text>{order.deliveryAddress}</Text>
 
           {order?.items?.map((item, index) => (

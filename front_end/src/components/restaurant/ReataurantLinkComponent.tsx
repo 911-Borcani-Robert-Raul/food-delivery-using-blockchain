@@ -19,6 +19,9 @@ export function RestaurantLinkComponent({ restaurant }: Props) {
       <Text fontSize="sm" mb={4}>
         {restaurant.description}
       </Text>
+      <Text fontSize="sm" mb={4}>
+        Restaurant rating: {restaurant.averageRating}
+      </Text>
       <Button
         as={RouterLink}
         to={`restaurant/${restaurant.addr}`}
