@@ -326,7 +326,6 @@ contract FoodDelivery {
         require(order.status == OrderStatus.PENDING, "Can only accept orders for which the status is PENDING");
 
         order.maxPreparationTime = maxPreparationTime;
-        order.preparationStartTime = block.timestamp;
         order.status = OrderStatus.WAITING_COURIER;
         ordersWaitingForCourier.push(orderId);
     }
@@ -359,7 +358,7 @@ contract FoodDelivery {
         require(order.status == OrderStatus.WAITING_COURIER, "Order must be in the processing state");
         order.courierAddr = msg.sender;
         order.maxDeliveryTime = maxDeliveryTime;
-        order.deliveryStartTime = block.timestamp;
+        order.preparationStartTime = block.timestamp;
         order.status = OrderStatus.ASSIGNED_COURIER;
         couriersToOrdersMapping[msg.sender].push(order.id);
         removeOrderFromWaitingList(orderId);
@@ -380,6 +379,7 @@ contract FoodDelivery {
         require(order.status == OrderStatus.READY_TO_DELIVER);
         require(order.courierAddr == msg.sender, "Order must be delivered by courier that accepted it");
 
+        order.deliveryStartTime = block.timestamp;
         order.status = OrderStatus.DELIVERING;
     }
 

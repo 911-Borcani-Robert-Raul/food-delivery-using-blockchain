@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import { Item } from "./Item";
 
 export enum OrderStatus {
@@ -43,6 +44,7 @@ export class Order {
   deliveryAddress: string;
   orderStatus: OrderStatus;
   items: Item[] | undefined;
+  preparationStartTime: number | undefined;
 
   constructor(
     orderId: number | undefined,
@@ -54,7 +56,8 @@ export class Order {
     quantities: number[] | undefined,
     deliveryFee: number,
     deliveryAddress: string,
-    orderStatus: OrderStatus
+    orderStatus: OrderStatus,
+    preparationStartTime: number | undefined | BigNumber
   ) {
     this.orderId = orderId;
     this.restaurantAddr = restaurantAddr;
@@ -66,5 +69,9 @@ export class Order {
     this.deliveryFee = deliveryFee;
     this.deliveryAddress = deliveryAddress;
     this.orderStatus = orderStatus;
+    this.preparationStartTime =
+      preparationStartTime instanceof BigNumber
+        ? preparationStartTime.toNumber()
+        : preparationStartTime;
   }
 }

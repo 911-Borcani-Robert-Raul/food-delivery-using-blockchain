@@ -1,11 +1,7 @@
-import { Link } from "react-router-dom";
-import { Item } from "../../domain/Item";
-import { Restaurant } from "../../domain/Restaurant";
+import { Box, Heading, SimpleGrid, VStack } from "@chakra-ui/react";
 import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { AddItemComponent } from "./AddItemComponent";
-import { ItemComponent } from "./ItemComponent";
 import { ItemManagementComponent } from "./ItemManagementComponent";
-import { Box, Heading, SimpleGrid, Text, VStack } from "@chakra-ui/react";
 
 interface ItemsListComponentProps {
   contractAddress: string;

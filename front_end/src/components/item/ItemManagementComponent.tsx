@@ -1,18 +1,14 @@
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormLabel,
   Input,
   Text,
-  Textarea,
+  Textarea
 } from "@chakra-ui/react";
-import { Contract } from "ethers";
 import { useEffect, useState } from "react";
-import { alchemyGoerliProvider } from "../../App";
 import { Item } from "../../domain/Item";
-import abi from "../../chain-info/contracts/FoodDelivery.json";
 import {
   useDisableItem,
   useEnableItem,

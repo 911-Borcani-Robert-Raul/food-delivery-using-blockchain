@@ -1,3 +1,6 @@
+import { Box, Button, FormLabel, Input, Text } from "@chakra-ui/react";
+import { useEthers } from "@usedapp/core";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getOrderStatusString, OrderStatus } from "../../domain/Order";
 import { Review } from "../../domain/Review";
@@ -5,9 +8,6 @@ import { useGetOrder, useIncreaseDeliveryFee } from "../../hooks/OrderHooks";
 import { useGetOrderReview, usePlaceReview } from "../../hooks/ReviewHooks";
 import { useGetContractAddress } from "../Main";
 import { CreateReviewComponent } from "../review/CreateReviewComponent";
-import { Box, Button, FormLabel, Input, Text } from "@chakra-ui/react";
-import { useEthers } from "@usedapp/core";
-import { useEffect, useState } from "react";
 
 interface Props {}
 
@@ -64,10 +64,17 @@ export function OrderComponent(_: Props) {
     }
   }, [increaseDeliveryFeeState]);
 
+  let orderDateAndTime = undefined;
+  if (order && order.preparationStartTime) {
+    const milliseconds = order.preparationStartTime * 1000;
+    orderDateAndTime = new Date(milliseconds);
+  }
+
   return (
     <Box display="flex" flexDirection="column" alignItems="center" pt={4}>
       {order && (
         <Box>
+          {orderDateAndTime && <Text>{orderDateAndTime.toLocaleString()}</Text>}
           <Text fontSize="xl" fontWeight="bold">
             {order.restaurantName}
           </Text>

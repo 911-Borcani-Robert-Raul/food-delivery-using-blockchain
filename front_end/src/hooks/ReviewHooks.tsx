@@ -1,16 +1,25 @@
-import { useEffect, useState } from "react";
-import { Review } from "../domain/Review";
-import abi from ".././chain-info/contracts/FoodDelivery.json";
-import { Contract, utils } from "ethers";
-import { alchemyGoerliProvider } from "../App";
 import { useBlockNumber, useContractFunction } from "@usedapp/core";
+import { Contract, utils } from "ethers";
+import { useEffect, useState } from "react";
+import abi from ".././chain-info/contracts/FoodDelivery.json";
+import { alchemyGoerliProvider } from "../App";
+import { Review } from "../domain/Review";
 
+/**
+ * Custom hook to fetch the review for a specific order from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param orderId - The ID of the order.
+ * @returns The review for the specified order.
+ */
 export function useGetOrderReview(contractAddress: string, orderId: number) {
   const [review, setReview] = useState<Review>();
 
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the review for the specified order from the smart contract.
+     */
     const fetchReview = async () => {
       const contractInterface = new utils.Interface(abi.abi);
       const contract = new Contract(
@@ -31,6 +40,12 @@ export function useGetOrderReview(contractAddress: string, orderId: number) {
   return review;
 }
 
+/**
+ * Retrieves the review for a specific order from the smart contract.
+ * @param contract - The instance of the smart contract.
+ * @param orderId - The ID of the order.
+ * @returns The review for the specified order.
+ */
 async function getReview(contract: Contract, orderId: number) {
   try {
     const value = await contract.callStatic.getReview(orderId);
@@ -47,6 +62,11 @@ async function getReview(contract: Contract, orderId: number) {
   }
 }
 
+/**
+ * Custom hook to place a review for an order using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to place a review.
+ */
 export function usePlaceReview(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -58,6 +78,10 @@ export function usePlaceReview(contractAddress: string) {
     transactionName: "PlaceReview",
   });
 
+  /**
+   * Places a review for an order using the smart contract.
+   * @param review - The review to be placed.
+   */
   const placeReview = async (review: Review) => {
     send(review.orderId, review.rating, review.comment);
   };

@@ -4,11 +4,19 @@ import { useEffect, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { alchemyGoerliProvider } from "../App";
 import { Restaurant } from "../domain/Restaurant";
-
+/**
+ * Custom hook to fetch a restaurant from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param address - The address of the restaurant.
+ * @returns The restaurant object.
+ */
 export function useGetRestaurant(contractAddress: string, address: string) {
   const [restaurant, setRestaurant] = useState<Restaurant>();
 
   useEffect(() => {
+    /**
+     * Fetches a restaurant from the smart contract.
+     */
     const fetchRestaurants = async () => {
       const contractInterface = new utils.Interface(abi.abi);
       const contract = new Contract(
@@ -33,6 +41,11 @@ export function useGetRestaurant(contractAddress: string, address: string) {
   return restaurant;
 }
 
+/**
+ * Custom hook to get the number of restaurants from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns The number of restaurants.
+ */
 export function useGetNumberOfRestaurants(contractAddress: string | Falsy) {
   const contractInterface = new utils.Interface(abi.abi);
   const { value, error } =
@@ -59,6 +72,12 @@ export function useGetNumberOfRestaurants(contractAddress: string | Falsy) {
   return undefined;
 }
 
+/**
+ * Custom hook to get the address of a restaurant at the specified index from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param index - The index of the restaurant.
+ * @returns The address of the restaurant.
+ */
 export function useGetRestaurantAddress(
   contractAddress: string | Falsy,
   index: number
@@ -88,6 +107,12 @@ export function useGetRestaurantAddress(
   return undefined;
 }
 
+/**
+ * Custom hook to fetch a list of restaurants from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param numberOfRestaurants - The number of restaurants to fetch.
+ * @returns An array of restaurant objects.
+ */
 export const useGetRestaurants = (
   contractAddress: string,
   numberOfRestaurants: number
@@ -95,6 +120,9 @@ export const useGetRestaurants = (
   const [restaurantList, setRestaurantList] = useState<Restaurant[]>([]);
 
   useEffect(() => {
+    /**
+     * Fetches a list of restaurants from the smart contract.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -125,20 +153,13 @@ export const useGetRestaurants = (
   return restaurantList;
 };
 
-async function getRestaurantAddress(
-  contract: Contract,
-  contractAddress: string,
-  index: number
-) {
-  try {
-    const value = await contract.callStatic.restaurantsAddr(index);
-    return value.toString();
-  } catch (error: any) {
-    console.error(`Error calling contract: ${error.toString()}`);
-    return undefined;
-  }
-}
-
+/**
+ * Retrieves a restaurant from the smart contract.
+ * @param contract - The instance of the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param address - The address of the restaurant.
+ * @returns The restaurant object.
+ */
 async function getRestaurant(
   contract: Contract,
   contractAddress: string,
@@ -171,6 +192,11 @@ async function getRestaurant(
   }
 }
 
+/**
+ * Custom hook to register a restaurant using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to register a restaurant.
+ */
 export function useRegisterRestaurant(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -182,6 +208,10 @@ export function useRegisterRestaurant(contractAddress: string) {
     transactionName: "RegisterRestaurant",
   });
 
+  /**
+   * Registers a restaurant using the smart contract.
+   * @param restaurant - The restaurant to be registered.
+   */
   const registerRestaurant = async (restaurant: Restaurant) => {
     send(restaurant.name, restaurant.description, restaurant.physicalAddress);
   };

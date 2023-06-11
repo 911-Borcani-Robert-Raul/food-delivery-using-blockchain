@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { useEthers } from "@usedapp/core";
-import { useGetRestaurant } from "../../hooks/RestaurantHooks";
-import { ItemsListManagementComponent } from "../item/ItemsListManagementComponent";
-import { useGetContractAddress } from "../Main";
-import { RestaurantOrdersComponent } from "./RestaurantOrdersComponent";
-import { RegisterRestaurantComponent } from "./RegisterRestaurantForm";
-import { Restaurant } from "../../domain/Restaurant";
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
+import { useEthers } from "@usedapp/core";
+import { useState } from "react";
+import { useGetRestaurant } from "../../hooks/RestaurantHooks";
+import { useGetContractAddress } from "../Main";
+import { ItemsListManagementComponent } from "../item/ItemsListManagementComponent";
+import { RegisterRestaurantComponent } from "./RegisterRestaurantForm";
+import { RestaurantOrdersComponent } from "./RestaurantOrdersComponent";
 
 export function RestaurantManagementComponent() {
   const contractAddr = useGetContractAddress();

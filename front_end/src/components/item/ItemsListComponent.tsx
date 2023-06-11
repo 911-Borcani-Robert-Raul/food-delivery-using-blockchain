@@ -1,8 +1,7 @@
-import { Box, Text, Link, Spinner } from "@chakra-ui/react";
+import { Box, Link, Text } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
-import { Item } from "../../domain/Item";
 import { Restaurant } from "../../domain/Restaurant";
-import { useGetItems, useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
+import { useGetItems } from "../../hooks/ItemHooks";
 import { ItemComponent } from "./ItemComponent";
 
 interface ItemsListComponentProps {

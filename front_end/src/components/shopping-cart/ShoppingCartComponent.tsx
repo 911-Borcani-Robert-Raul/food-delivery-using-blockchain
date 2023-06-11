@@ -1,3 +1,12 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { constants } from "ethers";
 import { useEffect, useState } from "react";
 import { Order, OrderStatus } from "../../domain/Order";
@@ -8,15 +17,6 @@ import {
   getCartState,
 } from "../../shopping-cart/ShoppingCart";
 import { useGetContractAddress } from "../Main";
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
 
 export function ShoppingCartComponent() {
   const [cartState, setCartState] = useState<CartState>({
@@ -54,7 +54,8 @@ export function ShoppingCartComponent() {
       Object.values(cartState.quantities),
       deliveryFee,
       address,
-      OrderStatus.PENDING
+      OrderStatus.PENDING,
+      undefined
     )
   );
 
@@ -76,7 +77,8 @@ export function ShoppingCartComponent() {
       itemQuantities,
       deliveryFee,
       address,
-      OrderStatus.PENDING
+      OrderStatus.PENDING,
+      undefined
     );
 
     await placeOrder(order);

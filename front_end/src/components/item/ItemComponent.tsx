@@ -1,6 +1,5 @@
 import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { Item } from "../../domain/Item";
-import { Restaurant } from "../../domain/Restaurant";
 import { addToCart } from "../../shopping-cart/ShoppingCart";
 
 interface ItemComponentProps {

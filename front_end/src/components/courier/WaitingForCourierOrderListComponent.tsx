@@ -1,26 +1,15 @@
-import { useEthers } from "@usedapp/core";
+import { Box } from "@chakra-ui/react";
 import React from "react";
-import { getOrderStatusString, OrderStatus } from "../../domain/Order";
+import { OrderStatus } from "../../domain/Order";
 import {
-  useChangeOrderStatus,
-  useGetNumberOfOrdersForRestaurant,
-  useGetNumberOfOrdersWaitingForCourier,
-  useGetOrdersForRestaurant,
-  useGetWaitingForCourierOrders,
+  useGetWaitingForCourierOrders
 } from "../../hooks/OrderHooks";
 import { useGetContractAddress } from "../Main";
-import { OrderLinkComponent } from "../order/OrderLinkComponent";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
-import { Box, Button, Flex, Heading, HStack, Text } from "@chakra-ui/react";
 
 export const WaitingForCourierOrderListComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
-  const { account } = useEthers();
-
-  const numberOfOrders = useGetNumberOfOrdersWaitingForCourier(contractAddress);
   const orders = useGetWaitingForCourierOrders(contractAddress);
-  const { state: takeOrderState, changeStatus: takeOrderSend } =
-    useChangeOrderStatus(contractAddress, OrderStatus.ASSIGNED_COURIER);
 
   return (
     <Box

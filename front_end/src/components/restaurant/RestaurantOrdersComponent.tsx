@@ -1,15 +1,13 @@
+import { Box, Heading } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import React from "react";
-import { getOrderStatusString, Order, OrderStatus } from "../../domain/Order";
+import { Order, OrderStatus } from "../../domain/Order";
 import {
-  useChangeOrderStatus,
   useGetNumberOfOrdersForRestaurant,
-  useGetOrdersForRestaurant,
+  useGetOrdersForRestaurant
 } from "../../hooks/OrderHooks";
 import { useGetContractAddress } from "../Main";
-import { OrderLinkComponent } from "../order/OrderLinkComponent";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
-import { Box, Heading } from "@chakra-ui/react";
 
 export const RestaurantOrdersComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();

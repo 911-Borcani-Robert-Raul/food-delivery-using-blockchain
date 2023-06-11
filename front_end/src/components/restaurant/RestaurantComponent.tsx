@@ -2,8 +2,8 @@ import { Box, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import { useGetNumberOfItemsInMenu } from "../../hooks/ItemHooks";
 import { useGetRestaurant } from "../../hooks/RestaurantHooks";
-import { ItemsListComponent } from "../item/ItemsListComponent";
 import { useGetContractAddress } from "../Main";
+import { ItemsListComponent } from "../item/ItemsListComponent";
 
 export function RestaurantComponent() {
   const contractAddr = useGetContractAddress();

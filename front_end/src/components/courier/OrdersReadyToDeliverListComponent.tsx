@@ -1,23 +1,17 @@
+import { Box, Text } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import React from "react";
 import { Order, OrderStatus } from "../../domain/Order";
 import {
-  useChangeOrderStatus,
-  useGetNumberOfOrdersForCourier,
-  useGetOrdersForCourier,
+  useGetOrdersForCourier
 } from "../../hooks/OrderHooks";
 import { useGetContractAddress } from "../Main";
 import { OrdersListComponentForStatusChange } from "../order/OrdersListComponentForStatusChange";
-import { Box, Text } from "@chakra-ui/react";
 
 export const OrdersReadyToDeliverListComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
   const { account } = useEthers();
 
-  const numberOfOrders = useGetNumberOfOrdersForCourier(
-    contractAddress,
-    account!
-  );
   const orders: Order[] = useGetOrdersForCourier(contractAddress, account!);
 
   const readyToDeliverOrders: Order[] = orders.filter(

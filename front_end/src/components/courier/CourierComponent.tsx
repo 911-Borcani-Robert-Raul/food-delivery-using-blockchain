@@ -1,4 +1,4 @@
-import { Box, Heading, SimpleGrid, VStack } from "@chakra-ui/react";
+import { Box, Heading, VStack } from "@chakra-ui/react";
 import React from "react";
 import { OrdersReadyToDeliverListComponent } from "./OrdersReadyToDeliverListComponent";
 import { WaitingForCourierOrderListComponent } from "./WaitingForCourierOrderListComponent";

@@ -1,3 +1,27 @@
 {
-    "editor.formatOnSave": true
+  "eslint.alwaysShowStatus": true,
+  "editor.formatOnSave": true,
+  "files.eol": "\r\n",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "prettier.arrowParens": "avoid",
+  "prettier.embeddedLanguageFormatting": "off",
+  "prettier.enable": false,
+  "eslint.format.enable": false,
+
+  "[css]": {
+    "editor.defaultFormatter": "aeschli.vscode-css-formatter"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }

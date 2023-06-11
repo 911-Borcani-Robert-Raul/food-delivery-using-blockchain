@@ -16,7 +16,6 @@ export function getCartState(): CartState {
 
   if (storedState) {
     const result: CartState = JSON.parse(storedState);
-    console.log(result);
     return result;
   } else {
     return {

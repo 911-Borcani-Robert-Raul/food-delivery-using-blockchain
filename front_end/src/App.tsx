@@ -1,17 +1,16 @@
+import { ChakraProvider } from "@chakra-ui/react";
 import { AlchemyProvider } from "@ethersproject/providers";
 import { Container } from "@material-ui/core";
 import { DAppProvider, Goerli } from "@usedapp/core";
-import { getDefaultProvider } from "ethers";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { CourierComponent } from "./components/courier/CourierComponent";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Header } from "./components/Header";
 import { Main } from "./components/Main";
+import { CourierComponent } from "./components/courier/CourierComponent";
 import { OrderComponent } from "./components/order/OrderComponent";
+import OrdersListComponent from "./components/order/OrdersListComponent";
 import { RestaurantComponent } from "./components/restaurant/RestaurantComponent";
 import { RestaurantManagementComponent } from "./components/restaurant/RestaurantManagementComponent";
 import { ShoppingCartComponent } from "./components/shopping-cart/ShoppingCartComponent";
-import { ChakraProvider } from "@chakra-ui/react";
-import OrdersListComponent from "./components/order/OrdersListComponent";
 
 const alchemyApiKey = "";
 const alchemyUrl = `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`;
@@ -96,7 +95,7 @@ function App() {
           readOnlyChainId: Goerli.chainId,
           readOnlyUrls: {
             [Goerli.chainId]: alchemyGoerliProvider,
-            5777: getDefaultProvider("http://localhost:7545"),
+            // 5777: getDefaultProvider("http://localhost:7545"),
           },
           refresh: "everyBlock",
         }}

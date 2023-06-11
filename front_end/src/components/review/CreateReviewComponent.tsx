@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Review } from "../../domain/Review";
 import {
+  Box,
+  Button,
   FormControl,
   FormLabel,
   Slider,
-  SliderTrack,
   SliderFilledTrack,
   SliderThumb,
+  SliderTrack,
   Textarea,
-  Button,
-  Box,
 } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Review } from "../../domain/Review";
 
 interface Props {
   onSubmit: (review: Review) => void;

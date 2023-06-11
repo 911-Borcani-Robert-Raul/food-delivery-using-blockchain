@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import { getOrderStatusString, Order, OrderStatus } from "../../domain/Order";
-import { useChangeOrderStatus } from "../../hooks/OrderHooks";
-import { OrderLinkComponent } from "./OrderLinkComponent";
-import { SingleOrderStatusChangeComponent } from "./SingleOrderStatusChangeComponent";
 import { Box, Grid, Text } from "@chakra-ui/react";
+import { Order, OrderStatus } from "../../domain/Order";
+import { SingleOrderStatusChangeComponent } from "./SingleOrderStatusChangeComponent";
 
 interface Props {
   contractAddress: string;

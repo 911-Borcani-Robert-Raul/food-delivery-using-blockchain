@@ -1,25 +1,29 @@
 import {
-  useBlockMeta,
   useBlockNumber,
   useCall,
-  useContractFunction,
-  useEthers,
+  useContractFunction
 } from "@usedapp/core";
 import { Contract, ethers, utils } from "ethers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { alchemyGoerliProvider } from "../App";
 import { Order, OrderStatus } from "../domain/Order";
 
-export function useGetOrder(
-  contractAddress: string,
-  orderId: number
-): Order | null {
+/**
+ * Custom hook to get an order from the smart contract based on its ID.
+ * @param contractAddress - The address of the smart contract.
+ * @param orderId - The ID of the order.
+ * @returns The order object or null if not found.
+ */
+export function useGetOrder(contractAddress: string, orderId: number): Order | null {
   const [order, setOrder] = useState<Order | null>(null);
 
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the data of an order from the smart contract.
+     */
     const fetchOrderData = async (): Promise<void> => {
       const contractInterface = new utils.Interface(abi.abi);
       const contract = new Contract(
@@ -41,6 +45,12 @@ export function useGetOrder(
   return order;
 }
 
+/**
+ * Custom hook to get the number of orders for a specific client from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param clientAddress - The address of the client.
+ * @returns The number of orders.
+ */
 export function useGetNumberOfOrders(
   contractAddress: string,
   clientAddress: string
@@ -71,6 +81,12 @@ export function useGetNumberOfOrders(
   return undefined;
 }
 
+/**
+ * Custom hook to get the number of orders for a specific restaurant from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @returns The number of orders.
+ */
 export function useGetNumberOfOrdersForRestaurant(
   contractAddress: string,
   restaurantAddress: string
@@ -101,6 +117,12 @@ export function useGetNumberOfOrdersForRestaurant(
   return undefined;
 }
 
+/**
+ * Custom hook to get the number of orders for a specific courier from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param courierAddress - The address of the courier.
+ * @returns The number of orders.
+ */
 export function useGetNumberOfOrdersForCourier(
   contractAddress: string,
   courierAddress: string
@@ -131,6 +153,11 @@ export function useGetNumberOfOrdersForCourier(
   return undefined;
 }
 
+/**
+ * Custom hook to get the number of orders waiting for a courier from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns The number of orders.
+ */
 export function useGetNumberOfOrdersWaitingForCourier(contractAddress: string) {
   const contractInterface = new utils.Interface(abi.abi);
   const { value, error } =
@@ -157,6 +184,12 @@ export function useGetNumberOfOrdersWaitingForCourier(contractAddress: string) {
   return undefined;
 }
 
+/**
+ * Custom hook to get all orders for a specific client from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param clientAddress - The address of the client.
+ * @returns An array of order objects.
+ */
 export const useGetOrders = (
   contractAddress: string,
   clientAddress: string
@@ -166,6 +199,9 @@ export const useGetOrders = (
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the list of orders for a client from the smart contract.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -176,24 +212,25 @@ export const useGetOrders = (
         const orders = await contract.callStatic.getAllOrdersForClient(
           clientAddress
         );
-        const formattedRestaurants = orders.map(
+        const formattedOrders = orders.map(
           (order: any) =>
             new Order(
               order.id,
-              order!.restaurantAddr,
-              order!.restaurantName,
-              order!.restaurantPhysicalAddress,
-              order!.clientAddr,
+              order.restaurantAddr,
+              order.restaurantName,
+              order.restaurantPhysicalAddress,
+              order.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
               order.deliveryAddress,
-              order!.status
+              order.status,
+              order.preparationStartTime
             )
         );
-        setOrdersList(formattedRestaurants);
+        setOrdersList(formattedOrders);
       } catch (error) {
-        console.error("Error fetching restaurant list:", error);
+        console.error("Error fetching order list:", error);
       }
     };
 
@@ -203,6 +240,12 @@ export const useGetOrders = (
   return ordersList;
 };
 
+/**
+ * Custom hook to get all orders for a specific restaurant from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @returns An array of order objects.
+ */
 export const useGetOrdersForRestaurant = (
   contractAddress: string,
   restaurantAddress: string
@@ -212,6 +255,9 @@ export const useGetOrdersForRestaurant = (
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the list of orders for a restaurant from the smart contract.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -222,24 +268,25 @@ export const useGetOrdersForRestaurant = (
         const orders = await contract.callStatic.getAllOrdersForRestaurant(
           restaurantAddress
         );
-        const formattedRestaurants = orders.map(
+        const formattedOrders = orders.map(
           (order: any) =>
             new Order(
               order.id,
-              order!.restaurantAddr,
-              order!.restaurantName,
-              order!.restaurantPhysicalAddress,
-              order!.clientAddr,
+              order.restaurantAddr,
+              order.restaurantName,
+              order.restaurantPhysicalAddress,
+              order.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
               order.deliveryAddress,
-              order!.status
+              order.status,
+              order.preparationStartTime
             )
         );
-        setOrdersList(formattedRestaurants);
+        setOrdersList(formattedOrders);
       } catch (error) {
-        console.error("Error fetching restaurant list:", error);
+        console.error("Error fetching order list:", error);
       }
     };
 
@@ -249,6 +296,12 @@ export const useGetOrdersForRestaurant = (
   return ordersList;
 };
 
+/**
+ * Custom hook to get all orders for a specific courier from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param courierAddress - The address of the courier.
+ * @returns An array of order objects.
+ */
 export const useGetOrdersForCourier = (
   contractAddress: string,
   courierAddress: string
@@ -258,6 +311,9 @@ export const useGetOrdersForCourier = (
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the list of orders for a courier from the smart contract.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -268,24 +324,25 @@ export const useGetOrdersForCourier = (
         const orders = await contract.callStatic.getOrdersForCouriers(
           courierAddress
         );
-        const formattedRestaurants = orders.map(
+        const formattedOrders = orders.map(
           (order: any) =>
             new Order(
               order.id,
-              order!.restaurantAddr,
-              order!.restaurantName,
-              order!.restaurantPhysicalAddress,
-              order!.clientAddr,
+              order.restaurantAddr,
+              order.restaurantName,
+              order.restaurantPhysicalAddress,
+              order.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
               order.deliveryAddress,
-              order!.status
+              order.status,
+              order.preparationStartTime
             )
         );
-        setOrdersList(formattedRestaurants);
+        setOrdersList(formattedOrders);
       } catch (error) {
-        console.error("Error fetching restaurant list:", error);
+        console.error("Error fetching order list:", error);
       }
     };
 
@@ -295,12 +352,20 @@ export const useGetOrdersForCourier = (
   return ordersList;
 };
 
+/**
+ * Custom hook to get all orders waiting for a courier from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An array of order objects.
+ */
 export const useGetWaitingForCourierOrders = (contractAddress: string) => {
   const [ordersList, setOrdersList] = useState<Order[]>([]);
 
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the list of orders waiting for a courier from the smart contract.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -311,24 +376,25 @@ export const useGetWaitingForCourierOrders = (contractAddress: string) => {
         const orders = await contract.callStatic.getOrdersByStatus(
           OrderStatus.WAITING_COURIER
         );
-        const formattedRestaurants = orders.map(
+        const formattedOrders = orders.map(
           (order: any) =>
             new Order(
               order.id,
-              order!.restaurantAddr,
-              order!.restaurantName,
-              order!.restaurantPhysicalAddress,
-              order!.clientAddr,
+              order.restaurantAddr,
+              order.restaurantName,
+              order.restaurantPhysicalAddress,
+              order.clientAddr,
               undefined,
               order.quantities,
               order.deliveryFee,
               order.deliveryAddress,
-              order!.status
+              order.status,
+              order.preparationStartTime
             )
         );
-        setOrdersList(formattedRestaurants);
+        setOrdersList(formattedOrders);
       } catch (error) {
-        console.error("Error fetching restaurant list:", error);
+        console.error("Error fetching order list:", error);
       }
     };
 
@@ -338,88 +404,31 @@ export const useGetWaitingForCourierOrders = (contractAddress: string) => {
   return ordersList;
 };
 
-async function getOrderId(
-  contract: Contract,
-  clientAddress: string,
-  index: number
-) {
-  try {
-    const value = await contract.callStatic.clientsToOrdersMapping(
-      clientAddress,
-      index
-    );
-    return value;
-  } catch (error: any) {
-    console.error(`Error calling contract: ${error.toString()}`);
-    return undefined;
-  }
-}
-
-async function getRestaurantOrderId(
-  contract: Contract,
-  restaurantAddress: string,
-  index: number
-) {
-  try {
-    const value = await contract.callStatic.restaurantToOrdersIds(
-      restaurantAddress,
-      index
-    );
-    return value;
-  } catch (error: any) {
-    console.error(`Error calling contract: ${error.toString()}`);
-    return undefined;
-  }
-}
-
-async function getCourierOrderId(
-  contract: Contract,
-  courierAddress: string,
-  index: number
-) {
-  try {
-    const value = await contract.callStatic.couriersToOrdersMapping(
-      courierAddress,
-      index
-    );
-    return value;
-  } catch (error: any) {
-    console.error(`Error calling contract: ${error.toString()}`);
-    return undefined;
-  }
-}
-
-async function getWaitingForCourierOrderId(contract: Contract, index: number) {
-  try {
-    const value = await contract.callStatic.ordersWaitingForCourier(index);
-    return value;
-  } catch (error: any) {
-    console.error(`Error calling contract: ${error.toString()}`);
-    return undefined;
-  }
-}
-
+/**
+ * Retrieves an order from the smart contract.
+ * @param contract - The contract instance.
+ * @param orderId - The ID of the order.
+ * @returns The order object or undefined if not found.
+ */
 async function getOrder(contract: Contract, orderId: number) {
   try {
     const order = await contract.callStatic.orders(orderId);
 
     if (order !== undefined) {
-      const [items, quantities] =
-        await contract.callStatic.getOrderItemsAndQuantities(orderId);
-
-      //   console.log("@##" + quantities);
+      const [items, quantities] = await contract.callStatic.getOrderItemsAndQuantities(orderId);
 
       const result = new Order(
         orderId,
-        order!.restaurantAddr,
-        order!.restaurantName,
-        order!.restaurantPhysicalAddress,
-        order!.clientAddr,
+        order.restaurantAddr,
+        order.restaurantName,
+        order.restaurantPhysicalAddress,
+        order.clientAddr,
         undefined,
         quantities,
         order.deliveryFee,
         order.deliveryAddress,
-        order!.status
+        order.status,
+        order.preparationStartTime
       );
       result.items = items;
 
@@ -434,6 +443,12 @@ async function getOrder(contract: Contract, orderId: number) {
   }
 }
 
+/**
+ * Custom hook to place an order.
+ * @param contractAddress - The address of the smart contract.
+ * @param order - The order object.
+ * @returns The state and function for placing an order.
+ */
 export function usePlaceOrder(contractAddress: string, order: Order) {
   const contract = new Contract(
     contractAddress,
@@ -446,26 +461,12 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
   });
 
   const placeOrder = async (order: Order) => {
-    // console.log(contractAddress);
-    // console.log(order.restaurantAddr);
-    // console.log(order.itemIds);
-    // console.log(order.quantities);
-    // console.log(order.deliveryFee);
-    console.log(
+    const { 0: totalPrice, 1: ethDeliveryFee } = await contract.getWeiPriceForOrder(
       order.restaurantAddr,
       order.itemIds,
       order.quantities,
       order.deliveryFee
     );
-    const { 0: totalPrice, 1: ethDeliveryFee } =
-      await contract.getWeiPriceForOrder(
-        order.restaurantAddr,
-        order.itemIds,
-        order.quantities,
-        order.deliveryFee
-      );
-
-    console.log("32423");
 
     const valueToSend = totalPrice.add(ethDeliveryFee);
     const valueToSendString = valueToSend.toString(); // convert to string
@@ -486,6 +487,11 @@ export function usePlaceOrder(contractAddress: string, order: Order) {
   return { state, placeOrder };
 }
 
+/**
+ * Custom hook to increase the delivery fee for an order.
+ * @param contractAddress - The address of the smart contract.
+ * @returns The state and function for increasing the delivery fee.
+ */
 export function useIncreaseDeliveryFee(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -508,6 +514,12 @@ export function useIncreaseDeliveryFee(contractAddress: string) {
   return { state, increaseFee };
 }
 
+/**
+ * Custom hook to change the status of an order.
+ * @param contractAddress - The address of the smart contract.
+ * @param toStatus - The desired status of the order.
+ * @returns The state and function for changing the order status.
+ */
 export function useChangeOrderStatus(
   contractAddress: string,
   toStatus: OrderStatus
@@ -561,11 +573,6 @@ export function useChangeOrderStatus(
     orderId: number,
     durationSeconds: number | undefined
   ) => {
-    // console.log(contractAddress);
-    // console.log(order.restaurantAddr);
-    // console.log(order.itemIds);
-    // console.log(order.quantities);
-    // console.log(order.deliveryFee);
     if (durationSeconds) {
       send(orderId, durationSeconds);
     } else {

@@ -1,12 +1,18 @@
+import { Box, Link as ChakraLink, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { getOrderStatusString, Order } from "../../domain/Order";
-import { Box, Text, Link as ChakraLink } from "@chakra-ui/react";
 
 interface Props {
   order: Order;
 }
 
 export function OrderLinkComponent({ order }: Props) {
+  let orderDateAndTime = undefined;
+  if (order.preparationStartTime) {
+    const milliseconds = order.preparationStartTime * 1000;
+    orderDateAndTime = new Date(milliseconds);
+  }
+
   return (
     <Box
       bg="white"
@@ -17,6 +23,7 @@ export function OrderLinkComponent({ order }: Props) {
       width="100%" // Take up all available horizontal space
     >
       <Text mb={1}>{order.restaurantName}</Text>
+      {orderDateAndTime && <Text>{orderDateAndTime.toLocaleString()}</Text>}
       <Text mb={1}>Address: {order.deliveryAddress}</Text>
       <Text fontWeight="bold" mb={1}>
         Order status: {getOrderStatusString(order.orderStatus)}

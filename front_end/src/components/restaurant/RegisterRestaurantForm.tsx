@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { Restaurant } from "../../domain/Restaurant";
-import { useRegisterRestaurant } from "../../hooks/RestaurantHooks";
 import {
   Box,
   Button,
@@ -11,6 +8,9 @@ import {
   Textarea,
   VStack,
 } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Restaurant } from "../../domain/Restaurant";
+import { useRegisterRestaurant } from "../../hooks/RestaurantHooks";
 
 interface RestaurantFormProps {
   contractAddress: string;

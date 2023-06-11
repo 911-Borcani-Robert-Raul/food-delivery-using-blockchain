@@ -1,17 +1,15 @@
+import { Box, Divider, Heading, VStack } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import React from "react";
 import { OrderStatus } from "../../domain/Order";
-import { useGetNumberOfOrders, useGetOrders } from "../../hooks/OrderHooks";
+import { useGetOrders } from "../../hooks/OrderHooks";
 import { useGetContractAddress } from "../Main";
-import { OrderLinkComponent } from "./OrderLinkComponent";
 import { OrdersListComponentForStatusChange } from "./OrdersListComponentForStatusChange";
-import { Box, Divider, Heading, VStack } from "@chakra-ui/react";
 
 const OrdersListComponent = React.memo(() => {
   const contractAddress = useGetContractAddress();
   const { account } = useEthers();
 
-  const numberOfOrders = useGetNumberOfOrders(contractAddress, account!);
   const orders = useGetOrders(contractAddress, account!);
 
   const deliveringOrders = orders.filter(

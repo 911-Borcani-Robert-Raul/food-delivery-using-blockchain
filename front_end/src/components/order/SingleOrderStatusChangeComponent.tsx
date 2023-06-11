@@ -1,12 +1,9 @@
 import { Box, Button, Input, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getOrderStatusString, Order, OrderStatus } from "../../domain/Order";
-import { Review } from "../../domain/Review";
-import { useChangeOrderStatus, useGetOrder } from "../../hooks/OrderHooks";
-import { useGetOrderReview, usePlaceReview } from "../../hooks/ReviewHooks";
+import { Order, OrderStatus } from "../../domain/Order";
+import { useChangeOrderStatus } from "../../hooks/OrderHooks";
+import { usePlaceReview } from "../../hooks/ReviewHooks";
 import { useGetContractAddress } from "../Main";
-import { CreateReviewComponent } from "../review/CreateReviewComponent";
 import { OrderLinkComponent } from "./OrderLinkComponent";
 
 interface Props {

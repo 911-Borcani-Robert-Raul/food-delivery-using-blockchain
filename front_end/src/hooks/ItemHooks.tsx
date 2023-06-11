@@ -1,15 +1,19 @@
 import {
-  Falsy,
   useBlockNumber,
   useCall,
-  useContractFunction,
+  useContractFunction
 } from "@usedapp/core";
 import { Contract, utils } from "ethers";
 import { useEffect, useState } from "react";
 import abi from ".././chain-info/contracts/FoodDelivery.json";
 import { alchemyGoerliProvider } from "../App";
 import { Item } from "../domain/Item";
-
+/**
+ * Custom hook to get the number of items in the menu of a restaurant from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @returns The number of items in the menu.
+ */
 export function useGetNumberOfItemsInMenu(
   contractAddress: string,
   restaurantAddress: string
@@ -35,6 +39,13 @@ export function useGetNumberOfItemsInMenu(
   return undefined;
 }
 
+/**
+ * Custom hook to get an item from the menu of a restaurant based on its index.
+ * @param contractAddress - The address of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @param index - The index of the item in the menu.
+ * @returns The item object.
+ */
 export function useGetItemByIndex(
   contractAddress: string,
   restaurantAddress: string,
@@ -43,6 +54,9 @@ export function useGetItemByIndex(
   const [item, setItem] = useState<Item>();
 
   useEffect(() => {
+    /**
+     * Fetches an item from the menu of a restaurant.
+     */
     const fetchRestaurants = async () => {
       const contractInterface = new utils.Interface(abi.abi);
       const contract = new Contract(
@@ -62,6 +76,12 @@ export function useGetItemByIndex(
   return item;
 }
 
+/**
+ * Custom hook to get all items in the menu of a restaurant from the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @returns An array of item objects.
+ */
 export function useGetItems(
   contractAddress: string,
   restaurantAddress: string
@@ -71,6 +91,9 @@ export function useGetItems(
   const block = useBlockNumber();
 
   useEffect(() => {
+    /**
+     * Fetches the list of items in the menu of a restaurant.
+     */
     const fetchRestaurantList = async () => {
       try {
         const contract: Contract = new Contract(
@@ -103,6 +126,13 @@ export function useGetItems(
   return items;
 }
 
+/**
+ * Retrieves an item from the smart contract based on its index in the menu of a restaurant.
+ * @param contract - The instance of the smart contract.
+ * @param restaurantAddress - The address of the restaurant.
+ * @param index - The index of the item in the menu.
+ * @returns The item object
+ */
 async function getItem(
   contract: Contract,
   restaurantAddress: string,
@@ -139,6 +169,11 @@ async function getItem(
   }
 }
 
+/**
+ * Custom hook to update an item in the menu using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to update an item.
+ */
 export function useUpdateItem(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -150,6 +185,10 @@ export function useUpdateItem(contractAddress: string) {
     transactionName: "UpdateItem",
   });
 
+  /**
+   * Updates an item in the menu using the smart contract.
+   * @param item - The item to be updated.
+   */
   const updateItem = async (item: Item) => {
     await contract.getWeiPriceForOrder(
       send(item.id, item.name, item.description, item.price)
@@ -159,6 +198,11 @@ export function useUpdateItem(contractAddress: string) {
   return { state, updateItem };
 }
 
+/**
+ * Custom hook to add an item to the menu using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to add an item.
+ */
 export function useAddItem(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -170,6 +214,10 @@ export function useAddItem(contractAddress: string) {
     transactionName: "AddItem",
   });
 
+  /**
+   * Adds an item to the menu using the smart contract.
+   * @param item - The item to be added.
+   */
   const addItem = async (item: Item) => {
     console.log(item.name);
     console.log(item.description);
@@ -181,6 +229,11 @@ export function useAddItem(contractAddress: string) {
   return { state, addItem };
 }
 
+/**
+ * Custom hook to enable an item in the menu using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to enable an item.
+ */
 export function useEnableItem(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -192,6 +245,10 @@ export function useEnableItem(contractAddress: string) {
     transactionName: "EnableItem",
   });
 
+  /**
+   * Enables an item in the menu using the smart contract.
+   * @param itemId - The ID of the item to be enabled.
+   */
   const enableItem = async (itemId: number) => {
     await contract.enableItem(send(itemId));
   };
@@ -199,6 +256,14 @@ export function useEnableItem(contractAddress: string) {
   return { state, enableItem };
 }
 
+/**
+ * Custom hook to disable an item in the menu using the smart contract.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to disable an
+ * item.
+ * @param contractAddress - The address of the smart contract.
+ * @returns An object with the state and a function to disable an item.
+ */
 export function useDisableItem(contractAddress: string) {
   const contract = new Contract(
     contractAddress,
@@ -210,6 +275,10 @@ export function useDisableItem(contractAddress: string) {
     transactionName: "DisableItem",
   });
 
+  /**
+   * Disables an item in the menu using the smart contract.
+   * @param itemId - The ID of the item to be disabled.
+   */
   const disableItem = async (itemId: number) => {
     await contract.disableItem(send(itemId));
   };

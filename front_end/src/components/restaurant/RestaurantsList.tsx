@@ -1,3 +1,4 @@
+import { Box, Center, Grid, GridItem, Spinner } from "@chakra-ui/react";
 import React from "react";
 import {
   useGetNumberOfRestaurants,
@@ -5,14 +6,25 @@ import {
 } from "../../hooks/RestaurantHooks";
 import { useGetContractAddress } from "../Main";
 import { RestaurantLinkComponent } from "./ReataurantLinkComponent";
-import { Box, Grid, GridItem, Center } from "@chakra-ui/react";
 
 export const RestaurantsList = React.memo(() => {
   const contractAddress = useGetContractAddress();
   const numberOfRestaurants = useGetNumberOfRestaurants(contractAddress);
   const restaurants = useGetRestaurants(contractAddress, numberOfRestaurants!);
 
-  console.log("RestaurantComponent render");
+  if (restaurants === undefined) {
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        height="200px"
+      >
+        <Spinner size="xl" color="blue.500" />
+      </Box>
+    );
+  }
+
   return (
     <Box
       p={6}
