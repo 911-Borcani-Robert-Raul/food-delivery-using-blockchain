@@ -3,11 +3,13 @@ import {
   Button,
   Link as ChakraLink,
   Flex,
+  Image,
   Spacer,
-  useBreakpointValue,
+  useBreakpointValue
 } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import { Link as RouterLink } from "react-router-dom";
+import logo from "./logo.png"; // Import the logo image file
 
 export const Header = () => {
   const { account, activateBrowserWallet, deactivate } = useEthers();
@@ -27,8 +29,8 @@ export const Header = () => {
       mx="auto"
     >
       <Flex alignItems="center" justifyContent="space-between" gap={4}>
-        <ChakraLink as={RouterLink} to="/" fontWeight="semibold">
-          Home
+      <ChakraLink as={RouterLink} to="/" fontWeight="semibold">
+          <Image src={logo} alt="Logo" boxSize={["40px", "60px"]} /> {/* Add the logo image */}
         </ChakraLink>
         <ChakraLink as={RouterLink} to="/shoppingCart" fontWeight="semibold">
           Shopping Cart
