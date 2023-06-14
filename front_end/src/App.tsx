@@ -12,7 +12,7 @@ import { RestaurantComponent } from "./components/restaurant/RestaurantComponent
 import { RestaurantManagementComponent } from "./components/restaurant/RestaurantManagementComponent";
 import { ShoppingCartComponent } from "./components/shopping-cart/ShoppingCartComponent";
 
-const alchemyApiKey = "";
+const alchemyApiKey = "IkArG5DA0XETBZgRCCspcYfoRJndJtJn";
 const alchemyUrl = `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`;
 
 export const alchemyGoerliProvider = new AlchemyProvider(
